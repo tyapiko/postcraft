@@ -64,7 +64,7 @@ export default async function handler(
 
 JSONのみを返し、他の説明は不要です。`
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
 
     const requestBody = {
       contents: [
@@ -85,12 +85,13 @@ JSONのみを返し、他の説明は不要です。`
     }
 
     console.log('=== Gemini API Request ===')
-    console.log('API URL:', apiUrl.replace(apiKey, 'API_KEY_HIDDEN'))
+    console.log('API URL:', apiUrl)
     console.log('Request Body:', JSON.stringify(requestBody, null, 2))
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
+        'x-goog-api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
