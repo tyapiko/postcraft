@@ -10,6 +10,7 @@ export default async function handler(
 
   console.log('Environment check:', {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ? '設定済み' : '未設定',
+    NEXT_PUBLIC_GEMINI_API_KEY: process.env.NEXT_PUBLIC_GEMINI_API_KEY ? '設定済み' : '未設定',
     PICA_SECRET_KEY: process.env.PICA_SECRET_KEY ? '設定済み' : '未設定',
     SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? '設定済み' : '未設定'
   });
@@ -21,7 +22,7 @@ export default async function handler(
       return res.status(400).json({ error: '必須パラメータが不足しています' })
     }
 
-    const apiKey = process.env.GEMINI_API_KEY
+    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
 
     if (!apiKey) {
       console.error('GEMINI_API_KEY is not configured')
