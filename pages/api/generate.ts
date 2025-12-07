@@ -65,7 +65,7 @@ export default async function handler(
 
 JSONのみを返し、他の説明は不要です。`
 
-    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
     const requestBody = {
       contents: [
