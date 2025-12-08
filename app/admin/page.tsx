@@ -124,7 +124,7 @@ export default function AdminDashboard() {
       title: 'SNS投稿生成',
       description: 'AI投稿生成ツールを使用',
       icon: MessageSquare,
-      href: '/generate',
+      href: '/admin/posts',
       color: 'border-purple-500'
     }
   ]
