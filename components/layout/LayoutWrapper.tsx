@@ -7,7 +7,8 @@ import Footer from './Footer'
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  const hideNavAndFooter = pathname?.startsWith('/admin') ||
+  const hideNavAndFooter = pathname === '/' ||
+                           pathname?.startsWith('/admin') ||
                            pathname?.startsWith('/dashboard') ||
                            pathname?.startsWith('/generate') ||
                            pathname === '/login' ||
