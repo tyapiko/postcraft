@@ -4,12 +4,13 @@ import { Inter } from 'next/font/google'
 import { AuthProvider } from '@/lib/auth-context'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
+import LayoutWrapper from '@/components/layout/LayoutWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Postcraft - AIコンテンツ生成ツール',
-  description: 'AIで作り、自動で届ける。SNS発信をもっとラクに。',
+  title: 'Citizen DS - 市民データサイエンティスト育成プラットフォーム',
+  description: 'データサイエンスとAIを学び、活用するためのプラットフォーム',
 }
 
 export default function RootLayout({
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
-            {children}
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
