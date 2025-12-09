@@ -55,8 +55,9 @@ const TiltCard = ({ children, className = '' }: { children: React.ReactNode; cla
   const mouseXSpring = useSpring(x)
   const mouseYSpring = useSpring(y)
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['17.5deg', '-17.5deg'])
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-17.5deg', '17.5deg'])
+  // 傾斜角度を控えめに（10度に変更）
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['10deg', '-10deg'])
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-10deg', '10deg'])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return
@@ -88,7 +89,8 @@ const TiltCard = ({ children, className = '' }: { children: React.ReactNode; cla
       }}
       className={`${className}`}
     >
-      <div style={{ transform: 'translateZ(75px)', transformStyle: 'preserve-3d' }}>
+      {/* translateZを削除して切れを防止 */}
+      <div style={{ transformStyle: 'preserve-3d' }}>
         {children}
       </div>
     </motion.div>
@@ -612,32 +614,29 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="relative p-8 md:p-12 rounded-2xl bg-gradient-to-br from-purple-900/30 via-transparent to-cyan-900/30 border border-purple-500/20 backdrop-blur-sm"
+                className="relative p-6 sm:p-8 md:p-12 rounded-2xl bg-gradient-to-br from-purple-900/30 via-transparent to-cyan-900/30 border border-purple-500/20 backdrop-blur-sm overflow-visible"
               >
                 {/* Glow effect */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 blur-xl" />
 
-                <h1 className="relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+                <h1 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4 sm:mb-6">
                   <GlitchText
-                    text="データの宇宙へ"
-                    className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent block mb-2"
+                    text="データの宇宙へ旅立とう"
+                    className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent block whitespace-nowrap"
                   />
-                  <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    旅立とう
-                  </span>
                 </h1>
 
                 {/* Typing effect */}
-                <div className="h-12 md:h-14 flex items-center justify-center mb-6">
-                  <span className="text-xl md:text-2xl lg:text-3xl font-medium">
+                <div className="h-10 sm:h-12 md:h-14 flex items-center justify-center mb-4 sm:mb-6">
+                  <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-medium">
                     あなたも
-                    <span className="text-cyan-400 font-bold mx-2">{typingText}</span>
+                    <span className="text-cyan-400 font-bold mx-1 sm:mx-2">{typingText}</span>
                     <span className="animate-pulse">|</span>
                     に
                   </span>
                 </div>
 
-                <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
                   エンジニアでなくても、データの力を手に入れられる。
                   <br className="hidden sm:block" />
                   <span className="text-cyan-400">すべてのビジネスパーソン</span>をデータ人材へ。
