@@ -36,7 +36,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/')
+  const isActive = (href: string): boolean => pathname === href || pathname?.startsWith(href + '/') || false
   const isDark = mounted && resolvedTheme === 'dark'
 
   // ダークモード時やスクロール時のテキスト色
