@@ -19,10 +19,12 @@ import {
   BookOpen,
   GraduationCap,
   Library,
-  Wand2
+  Wand2,
+  Star,
+  Rocket
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 const navItems = [
   { href: '/blog', label: 'Blog', icon: BookOpen },
@@ -30,6 +32,199 @@ const navItems = [
   { href: '/books', label: 'Books', icon: Library },
   { href: '/generate', label: 'AI Generator', icon: Wand2 },
 ]
+
+// Star component for the starfield
+const StarField = ({ count = 150 }: { count?: number }) => {
+  const stars = useMemo(() => {
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      duration: Math.random() * 3 + 2,
+      delay: Math.random() * 5,
+    }))
+  }, [count])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: star.size,
+            height: star.size,
+          }}
+          animate={{
+            opacity: [0.2, 1, 0.2],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: star.duration,
+            delay: star.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Shooting star component
+const ShootingStars = () => {
+  const [shootingStars, setShootingStars] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+
+  useEffect(() => {
+    const stars = Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 50,
+      delay: i * 3 + Math.random() * 2,
+    }))
+    setShootingStars(stars)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {shootingStars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            boxShadow: '0 0 6px 2px rgba(255,255,255,0.8), -30px 0 20px rgba(255,255,255,0.4), -60px 0 30px rgba(255,255,255,0.2)',
+          }}
+          initial={{ x: 0, y: 0, opacity: 0 }}
+          animate={{
+            x: [0, 200],
+            y: [0, 100],
+            opacity: [0, 1, 1, 0],
+          }}
+          transition={{
+            duration: 1.5,
+            delay: star.delay,
+            repeat: Infinity,
+            repeatDelay: 8 + Math.random() * 5,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Nebula/Galaxy cloud effect
+const NebulaEffect = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Purple nebula */}
+      <motion.div
+        className="absolute w-[800px] h-[800px] rounded-full opacity-20"
+        style={{
+          background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.1) 40%, transparent 70%)',
+          left: '-20%',
+          top: '-10%',
+          filter: 'blur(60px)',
+        }}
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+      {/* Blue nebula */}
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full opacity-20"
+        style={{
+          background: 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 40%, transparent 70%)',
+          right: '-10%',
+          top: '20%',
+          filter: 'blur(50px)',
+        }}
+        animate={{
+          scale: [1.1, 1, 1.1],
+          opacity: [0.2, 0.3, 0.2],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+      {/* Cyan nebula */}
+      <motion.div
+        className="absolute w-[500px] h-[500px] rounded-full opacity-15"
+        style={{
+          background: 'radial-gradient(circle, rgba(34,211,238,0.3) 0%, rgba(34,211,238,0.1) 40%, transparent 70%)',
+          left: '30%',
+          bottom: '-20%',
+          filter: 'blur(40px)',
+        }}
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.1, 0.2, 0.1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+    </div>
+  )
+}
+
+// Floating particles
+const FloatingParticles = () => {
+  const particles = useMemo(() => {
+    return Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 4 + 2,
+      duration: Math.random() * 20 + 15,
+      delay: Math.random() * 10,
+    }))
+  }, [])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            width: particle.size,
+            height: particle.size,
+            background: `radial-gradient(circle, rgba(167,139,250,0.6) 0%, transparent 70%)`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            x: [0, 10, 0],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: particle.duration,
+            delay: particle.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function HomePage() {
   const [scrollY, setScrollY] = useState(0)
@@ -46,17 +241,24 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0a0a1a]">
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? 'bg-black/95 backdrop-blur-md shadow-lg'
+          ? 'bg-[#0a0a1a]/90 backdrop-blur-xl shadow-lg shadow-purple-500/10 border-b border-purple-500/20'
           : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold tracking-tight">
-            <span className={isScrolled ? 'text-white' : 'text-white'}>DATA</span>
-            <span className="text-green-500">CRAFT</span>
+          <Link href="/" className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            >
+              <Star className="w-6 h-6 text-purple-400" fill="currentColor" />
+            </motion.div>
+            <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              DATACRAFT
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -65,11 +267,7 @@ export default function HomePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`font-medium transition-colors flex items-center gap-2 ${
-                  isScrolled
-                    ? 'text-gray-300 hover:text-green-400'
-                    : 'text-gray-300 hover:text-green-400'
-                }`}
+                className="font-medium transition-all flex items-center gap-2 text-gray-300 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]"
               >
                 <item.icon size={16} />
                 {item.label}
@@ -81,15 +279,15 @@ export default function HomePage() {
             <Button
               variant="ghost"
               asChild
-              className={isScrolled
-                ? 'text-white hover:text-green-400 hover:bg-white/10'
-                : 'text-white hover:text-green-400 hover:bg-white/10'
-              }
+              className="text-gray-300 hover:text-cyan-400 hover:bg-cyan-500/10"
             >
               <Link href="/login">Login</Link>
             </Button>
-            <Button asChild className="bg-green-500 hover:bg-green-400 text-black font-semibold">
-              <Link href="/signup">Sign Up Free</Link>
+            <Button asChild className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all">
+              <Link href="/signup">
+                <Rocket className="w-4 h-4 mr-2" />
+                Launch Free
+              </Link>
             </Button>
           </div>
 
@@ -110,7 +308,7 @@ export default function HomePage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-black/95 backdrop-blur-md border-t border-white/10"
+              className="md:hidden bg-[#0a0a1a]/95 backdrop-blur-xl border-t border-purple-500/20"
             >
               <div className="container mx-auto px-6 py-4 space-y-2">
                 {navItems.map((item, index) => (
@@ -123,22 +321,23 @@ export default function HomePage() {
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 py-3 px-4 text-white hover:bg-white/10 rounded-lg transition-colors"
+                      className="flex items-center gap-3 py-3 px-4 text-white hover:bg-purple-500/20 rounded-lg transition-colors"
                     >
-                      <item.icon size={20} className="text-green-400" />
+                      <item.icon size={20} className="text-cyan-400" />
                       {item.label}
                     </Link>
                   </motion.div>
                 ))}
-                <div className="pt-4 border-t border-white/10 space-y-2">
+                <div className="pt-4 border-t border-purple-500/20 space-y-2">
                   <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full text-white hover:bg-white/10 justify-start">
+                    <Button variant="ghost" className="w-full text-white hover:bg-purple-500/20 justify-start">
                       Login
                     </Button>
                   </Link>
                   <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-green-500 hover:bg-green-400 text-black font-semibold">
-                      Sign Up Free
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold">
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Launch Free
                     </Button>
                   </Link>
                 </div>
@@ -149,88 +348,107 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-screen bg-black text-white flex items-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
-          <div className="absolute inset-0 opacity-20">
-            <div className="grid grid-cols-12 gap-4 h-full w-full p-8">
-              {Array.from({ length: 48 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0.1, 0.3, 0.1] }}
-                  transition={{ duration: 3, delay: i * 0.1, repeat: Infinity }}
-                  className="border border-green-500/20"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      <section className="relative min-h-screen text-white flex items-center overflow-hidden">
+        {/* Deep space background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0a0a1a]" />
 
-        <div className="relative z-10 container mx-auto px-6">
+        {/* Star field */}
+        <StarField count={200} />
+
+        {/* Shooting stars */}
+        <ShootingStars />
+
+        {/* Nebula effects */}
+        <NebulaEffect />
+
+        {/* Floating particles */}
+        <FloatingParticles />
+
+        {/* Radial glow from center */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.15) 0%, transparent 50%)',
+          }}
+        />
+
+        <div className="relative z-10 container mx-auto px-6 pt-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto"
           >
-            <p className="text-green-400 text-sm tracking-[0.3em] mb-6 font-medium">
-              CITIZEN DATA SCIENTIST
-            </p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 border border-purple-500/30 mb-8"
+            >
+              <Sparkles className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-sm tracking-widest">CITIZEN DATA SCIENTIST</span>
+            </motion.div>
+
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8">
-              データで、<br />
-              <span className="text-green-400">未来</span>を創る。
+              <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                データの宇宙へ
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                旅立とう
+              </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 leading-relaxed">
-              エンジニアでなくても、データサイエンティストになれる。<br />
-              AI時代の最強スキルを、あなたの手に。
+
+            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed">
+              エンジニアでなくても、データサイエンティストになれる。
+              <br className="hidden md:block" />
+              <span className="text-cyan-400">AI時代の最強スキル</span>を、あなたの手に。
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button
                 asChild
-                className="bg-green-500 hover:bg-green-400 text-black font-bold px-8 py-6 text-lg rounded-none transition-all"
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-8 py-6 text-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105"
               >
-                <Link href="/signup">無料で始める</Link>
+                <Link href="/signup" className="flex items-center gap-2">
+                  <Rocket className="w-5 h-5" />
+                  無料で始める
+                </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="border-2 border-white hover:bg-white hover:text-black px-8 py-6 text-lg rounded-none transition-all text-white"
+                size="lg"
+                className="border-2 border-purple-500/50 hover:border-purple-400 hover:bg-purple-500/20 px-8 py-6 text-lg transition-all text-white bg-transparent"
               >
                 <Link href="#features">詳しく見る</Link>
               </Button>
             </div>
 
             {/* Quick Links */}
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/learning"
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm text-gray-300 hover:text-white transition-all"
-              >
-                <GraduationCap size={16} className="text-green-400" />
-                学習コース
-              </Link>
-              <Link
-                href="/blog"
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm text-gray-300 hover:text-white transition-all"
-              >
-                <BookOpen size={16} className="text-green-400" />
-                ブログ記事
-              </Link>
-              <Link
-                href="/books"
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm text-gray-300 hover:text-white transition-all"
-              >
-                <Library size={16} className="text-green-400" />
-                書籍
-              </Link>
-              <Link
-                href="/generate"
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm text-gray-300 hover:text-white transition-all"
-              >
-                <Wand2 size={16} className="text-green-400" />
-                AI生成ツール
-              </Link>
-            </div>
+            <motion.div
+              className="flex flex-wrap gap-3 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              {[
+                { href: '/learning', icon: GraduationCap, label: '学習コース', color: 'from-purple-500/20 to-purple-600/20' },
+                { href: '/blog', icon: BookOpen, label: 'ブログ記事', color: 'from-cyan-500/20 to-cyan-600/20' },
+                { href: '/books', icon: Library, label: '書籍', color: 'from-blue-500/20 to-blue-600/20' },
+                { href: '/generate', icon: Wand2, label: 'AI生成ツール', color: 'from-pink-500/20 to-pink-600/20' },
+              ].map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 px-5 py-3 bg-gradient-to-r ${item.color} backdrop-blur-sm border border-white/10 rounded-full text-sm text-gray-200 hover:text-white hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all group`}
+                >
+                  <item.icon size={16} className="text-cyan-400 group-hover:text-cyan-300" />
+                  {item.label}
+                </Link>
+              ))}
+            </motion.div>
           </motion.div>
         </div>
 
@@ -240,27 +458,32 @@ export default function HomePage() {
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <span className="text-sm tracking-widest text-gray-500 block mb-2">SCROLL</span>
-          <ChevronDown className="w-6 h-6 text-green-400 mx-auto" />
+          <span className="text-sm tracking-widest text-purple-400 block mb-2">SCROLL</span>
+          <ChevronDown className="w-6 h-6 text-cyan-400 mx-auto" />
         </motion.div>
       </section>
 
       {/* What is Citizen Data Scientist */}
-      <section className="py-24 px-6 bg-white">
-        <div className="container mx-auto max-w-5xl">
+      <section className="relative py-24 px-6 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#0f0f2a] to-[#0a0a1a]" />
+        <StarField count={50} />
+
+        <div className="relative z-10 container mx-auto max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-sm tracking-[0.3em] text-green-500 mb-4 font-medium">CONCEPT</h2>
-            <h3 className="text-4xl md:text-5xl font-bold mb-8 text-black">
+            <h2 className="text-sm tracking-[0.3em] text-cyan-400 mb-4 font-medium">CONCEPT</h2>
+            <h3 className="text-4xl md:text-5xl font-bold mb-8 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
               市民データサイエンティストとは？
             </h3>
-            <p className="text-xl text-gray-600 leading-relaxed mb-12">
+            <p className="text-xl text-gray-300 leading-relaxed mb-12">
               会社に一人はいる、エンジニアじゃないのにエンジニアレベルのITスキルとデータサイエンス力を持つ人。
-              それが「市民データサイエンティスト（Citizen Data Scientist）」です。<br /><br />
+              それが「市民データサイエンティスト（Citizen Data Scientist）」です。
+              <br /><br />
               営業・マーケター・人事・経理など、あらゆる部門で「データを武器にできる人材」が求められています。
               私たちは、その育成と支援を行います。
             </p>
@@ -268,9 +491,9 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: Target, label: '対象者', text: '非エンジニア全般' },
-              { icon: TrendingUp, label: '目標', text: 'データ活用人材' },
-              { icon: Zap, label: '成果', text: '生産性10倍' }
+              { icon: Target, label: '対象者', text: '非エンジニア全般', color: 'purple' },
+              { icon: TrendingUp, label: '目標', text: 'データ活用人材', color: 'cyan' },
+              { icon: Zap, label: '成果', text: '生産性10倍', color: 'pink' }
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -278,11 +501,17 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="border-l-4 border-green-500 bg-gray-50 p-6"
+                className="relative group"
               >
-                <item.icon className="w-8 h-8 text-green-500 mb-4" />
-                <h4 className="text-sm font-medium text-gray-500 mb-2">{item.label}</h4>
-                <p className="text-xl font-bold text-black">{item.text}</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-lg hover:border-purple-500/50 transition-all">
+                  <item.icon className={`w-8 h-8 mb-4 ${
+                    item.color === 'purple' ? 'text-purple-400' :
+                    item.color === 'cyan' ? 'text-cyan-400' : 'text-pink-400'
+                  }`} />
+                  <h4 className="text-sm font-medium text-gray-400 mb-2">{item.label}</h4>
+                  <p className="text-xl font-bold text-white">{item.text}</p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -290,8 +519,13 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 px-6 bg-black text-white">
-        <div className="container mx-auto max-w-6xl">
+      <section id="features" className="relative py-24 px-6 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a0a2a] to-[#0a0a1a]" />
+        <StarField count={80} />
+        <NebulaEffect />
+
+        <div className="relative z-10 container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -299,8 +533,10 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="text-sm tracking-[0.3em] text-green-400 mb-4 font-medium">FEATURES</h2>
-            <h3 className="text-4xl md:text-5xl font-bold mb-6">習得できるスキル</h3>
+            <h2 className="text-sm tracking-[0.3em] text-cyan-400 mb-4 font-medium">FEATURES</h2>
+            <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              習得できるスキル
+            </h3>
             <p className="text-xl text-gray-400">段階的に、確実に、データサイエンティストへ</p>
           </motion.div>
 
@@ -310,25 +546,29 @@ export default function HomePage() {
                 number: '01',
                 icon: Bot,
                 title: 'AI活用術',
-                description: 'ChatGPT、Claude、Geminiなど生成AIを使いこなし、業務効率を劇的に改善'
+                description: 'ChatGPT、Claude、Geminiなど生成AIを使いこなし、業務効率を劇的に改善',
+                gradient: 'from-purple-500 to-pink-500'
               },
               {
                 number: '02',
                 icon: BarChart,
                 title: 'データ分析',
-                description: 'Excel→SQL→Python→機械学習へステップアップ。実務で使える分析力を習得'
+                description: 'Excel→SQL→Python→機械学習へステップアップ。実務で使える分析力を習得',
+                gradient: 'from-cyan-500 to-blue-500'
               },
               {
                 number: '03',
                 icon: Zap,
                 title: '業務自動化',
-                description: 'RPAやスクリプトで単純作業を自動化。生産性を10倍に向上'
+                description: 'RPAやスクリプトで単純作業を自動化。生産性を10倍に向上',
+                gradient: 'from-yellow-500 to-orange-500'
               },
               {
                 number: '04',
                 icon: LineChart,
                 title: 'データ可視化',
-                description: 'Tableau、PowerBIで説得力のあるダッシュボードを作成。意思決定を加速'
+                description: 'Tableau、PowerBIで説得力のあるダッシュボードを作成。意思決定を加速',
+                gradient: 'from-green-500 to-cyan-500'
               }
             ].map((feature, i) => (
               <motion.div
@@ -337,14 +577,16 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group bg-white/5 backdrop-blur-sm border border-white/10 p-8 hover:border-green-500/50 transition-all duration-300"
+                className="group relative"
               >
-                <div className="text-green-400 text-5xl font-bold mb-4 opacity-50">{feature.number}</div>
-                <feature.icon className="w-10 h-10 text-green-400 mb-4" />
-                <h4 className="text-xl font-bold mb-3">{feature.title}</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-                <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-green-400 text-sm font-medium">→ 詳しく見る</span>
+                <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} rounded-xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-xl hover:border-purple-500/50 transition-all duration-300 h-full">
+                  <div className={`text-5xl font-bold mb-4 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent opacity-50`}>
+                    {feature.number}
+                  </div>
+                  <feature.icon className={`w-10 h-10 mb-4 bg-gradient-to-r ${feature.gradient} bg-clip-text`} style={{ color: feature.gradient.includes('purple') ? '#a855f7' : feature.gradient.includes('cyan') ? '#22d3ee' : feature.gradient.includes('yellow') ? '#eab308' : '#22c55e' }} />
+                  <h4 className="text-xl font-bold mb-3 text-white">{feature.title}</h4>
+                  <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -353,8 +595,12 @@ export default function HomePage() {
       </section>
 
       {/* Skills */}
-      <section className="py-24 px-6 bg-gray-50">
-        <div className="container mx-auto max-w-6xl">
+      <section className="relative py-24 px-6 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#0a1a2a] to-[#0a0a1a]" />
+        <StarField count={60} />
+
+        <div className="relative z-10 container mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -362,8 +608,10 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="text-sm tracking-[0.3em] text-green-500 mb-4 font-medium">SKILLS</h2>
-            <h3 className="text-4xl md:text-5xl font-bold mb-6 text-black">身につく技術スタック</h3>
+            <h2 className="text-sm tracking-[0.3em] text-cyan-400 mb-4 font-medium">SKILLS</h2>
+            <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-cyan-200 to-white bg-clip-text text-transparent">
+              身につく技術スタック
+            </h3>
           </motion.div>
 
           <div className="flex flex-wrap gap-3 justify-center">
@@ -379,7 +627,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: i * 0.02 }}
-                className="px-6 py-3 bg-white border border-gray-200 text-black font-medium hover:border-green-500 hover:text-green-500 transition-all cursor-default"
+                className="px-6 py-3 bg-white/5 backdrop-blur-sm border border-white/10 text-gray-300 font-medium rounded-full hover:border-purple-500/50 hover:text-purple-300 hover:bg-purple-500/10 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-default"
               >
                 {skill}
               </motion.span>
@@ -389,8 +637,12 @@ export default function HomePage() {
       </section>
 
       {/* Tools Preview */}
-      <section className="py-24 px-6 bg-white">
-        <div className="container mx-auto max-w-5xl">
+      <section className="relative py-24 px-6 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0a0a1a]" />
+        <StarField count={70} />
+
+        <div className="relative z-10 container mx-auto max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -398,9 +650,11 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h2 className="text-sm tracking-[0.3em] text-green-500 mb-4 font-medium">TOOLS</h2>
-            <h3 className="text-4xl md:text-5xl font-bold mb-6 text-black">実践的なツール</h3>
-            <p className="text-xl text-gray-600">学習だけでなく、実務で使えるツールを提供</p>
+            <h2 className="text-sm tracking-[0.3em] text-cyan-400 mb-4 font-medium">TOOLS</h2>
+            <h3 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              実践的なツール
+            </h3>
+            <p className="text-xl text-gray-400">学習だけでなく、実務で使えるツールを提供</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -409,19 +663,22 @@ export default function HomePage() {
                 icon: Sparkles,
                 title: 'AI投稿生成',
                 description: 'SNS投稿をAIで自動生成。マーケティング業務を効率化',
-                link: '/generate'
+                link: '/generate',
+                gradient: 'from-pink-500 to-purple-500'
               },
               {
                 icon: Database,
                 title: 'データ管理',
                 description: '生成したコンテンツをNotionに保存。一元管理で効率アップ',
-                link: '/dashboard'
+                link: '/dashboard',
+                gradient: 'from-cyan-500 to-blue-500'
               },
               {
                 icon: Brain,
                 title: '学習リソース',
                 description: '段階的なカリキュラムで、確実にスキルアップ',
-                link: '/dashboard'
+                link: '/learning',
+                gradient: 'from-purple-500 to-cyan-500'
               }
             ].map((tool, i) => (
               <motion.div
@@ -430,18 +687,23 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group border-l-4 border-green-500 bg-white p-8 hover:shadow-2xl transition-all duration-300"
+                className="group relative"
               >
-                <tool.icon className="w-12 h-12 text-green-500 mb-6" />
-                <h4 className="text-xl font-bold mb-3 text-black">{tool.title}</h4>
-                <p className="text-gray-600 mb-6">{tool.description}</p>
-                <Link
-                  href={tool.link}
-                  className="text-green-500 font-medium inline-flex items-center group-hover:gap-2 transition-all"
-                >
-                  試してみる
-                  <span className="inline-block group-hover:translate-x-1 transition-transform">→</span>
-                </Link>
+                <div className={`absolute inset-0 bg-gradient-to-r ${tool.gradient} rounded-xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-xl hover:border-purple-500/50 transition-all duration-300 h-full">
+                  <div className={`w-14 h-14 rounded-lg bg-gradient-to-r ${tool.gradient} p-3 mb-6`}>
+                    <tool.icon className="w-full h-full text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold mb-3 text-white">{tool.title}</h4>
+                  <p className="text-gray-400 mb-6">{tool.description}</p>
+                  <Link
+                    href={tool.link}
+                    className="text-cyan-400 font-medium inline-flex items-center hover:text-cyan-300 transition-colors group-hover:gap-2"
+                  >
+                    試してみる
+                    <span className="inline-block group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -449,27 +711,61 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-black text-white">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="relative py-32 px-6 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a0a2a] to-[#0a0a1a]" />
+        <StarField count={100} />
+        <NebulaEffect />
+
+        {/* Central glow */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.3) 0%, transparent 50%)',
+          }}
+        />
+
+        <div className="relative z-10 container mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="inline-block mb-8"
+            >
+              <Rocket className="w-16 h-16 text-purple-400" />
+            </motion.div>
+
             <h2 className="text-4xl md:text-6xl font-bold mb-8">
-              今日から、<br className="md:hidden" />
-              <span className="text-green-400">データサイエンティスト</span>へ
+              <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                今日から、
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                データの宇宙へ
+              </span>
             </h2>
-            <p className="text-xl text-gray-400 mb-12">
-              会社で一番頼られる存在になりませんか？<br />
+            <p className="text-xl text-gray-300 mb-12">
+              会社で一番頼られる存在になりませんか？
+              <br />
               無料で今すぐ始められます。
             </p>
             <Button
               asChild
-              className="bg-green-500 hover:bg-green-400 text-black font-bold px-12 py-6 text-lg rounded-none transition-all"
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-12 py-6 text-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105"
             >
-              <Link href="/signup">無料で始める</Link>
+              <Link href="/signup" className="flex items-center gap-2">
+                <Rocket className="w-5 h-5" />
+                無料で始める
+              </Link>
             </Button>
             <p className="text-sm text-gray-500 mt-6">クレジットカード不要 • 3分で登録完了</p>
           </motion.div>
@@ -477,13 +773,20 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 bg-black border-t border-gray-800">
-        <div className="container mx-auto max-w-6xl">
+      <footer className="relative py-16 px-6 overflow-hidden border-t border-purple-500/20">
+        {/* Background */}
+        <div className="absolute inset-0 bg-[#0a0a1a]" />
+        <StarField count={30} />
+
+        <div className="relative z-10 container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="md:col-span-1">
-              <div className="text-2xl font-bold text-white mb-4">
-                DATA<span className="text-green-500">CRAFT</span>
+              <div className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <Star className="w-5 h-5 text-purple-400" fill="currentColor" />
+                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                  DATACRAFT
+                </span>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Citizen Data Scientistを育成し、
@@ -496,19 +799,19 @@ export default function HomePage() {
               <h4 className="text-white font-semibold mb-4">Content</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/blog" className="text-gray-400 hover:text-green-400 transition-colors flex items-center gap-2">
+                  <Link href="/blog" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                     <BookOpen size={14} />
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link href="/learning" className="text-gray-400 hover:text-green-400 transition-colors flex items-center gap-2">
+                  <Link href="/learning" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                     <GraduationCap size={14} />
                     Learning
                   </Link>
                 </li>
                 <li>
-                  <Link href="/books" className="text-gray-400 hover:text-green-400 transition-colors flex items-center gap-2">
+                  <Link href="/books" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                     <Library size={14} />
                     Books
                   </Link>
@@ -521,13 +824,13 @@ export default function HomePage() {
               <h4 className="text-white font-semibold mb-4">Tools</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/generate" className="text-gray-400 hover:text-green-400 transition-colors flex items-center gap-2">
+                  <Link href="/generate" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                     <Wand2 size={14} />
                     AI Generator
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="text-gray-400 hover:text-green-400 transition-colors flex items-center gap-2">
+                  <Link href="/dashboard" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
                     <Database size={14} />
                     Dashboard
                   </Link>
@@ -540,12 +843,12 @@ export default function HomePage() {
               <h4 className="text-white font-semibold mb-4">Account</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/login" className="text-gray-400 hover:text-green-400 transition-colors">
+                  <Link href="/login" className="text-gray-400 hover:text-cyan-400 transition-colors">
                     Login
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup" className="text-gray-400 hover:text-green-400 transition-colors">
+                  <Link href="/signup" className="text-gray-400 hover:text-cyan-400 transition-colors">
                     Sign Up
                   </Link>
                 </li>
@@ -553,13 +856,13 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="pt-8 border-t border-purple-500/20 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-500">
               © 2024 DATACRAFT. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-gray-500">
-              <Link href="#" className="hover:text-green-400 transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-green-400 transition-colors">Terms of Service</Link>
+              <Link href="#" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link>
+              <Link href="#" className="hover:text-cyan-400 transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>
