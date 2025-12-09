@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
   Brain,
@@ -27,8 +26,8 @@ import {
   Users,
   Globe
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState, useMemo } from 'react'
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion'
+import { useEffect, useState, useMemo, useRef } from 'react'
 
 const navItems = [
   { href: '/blog', label: 'Blog', icon: BookOpen },
@@ -36,6 +35,157 @@ const navItems = [
   { href: '/books', label: 'Books', icon: Library },
   { href: '/generate', label: 'AI Generator', icon: Wand2 },
 ]
+
+// Chapiko Logo component
+const ChapikoLogo = ({ className = '' }: { className?: string }) => (
+  <div className={`font-bold tracking-tight ${className}`}>
+    <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+      Chapiko
+    </span>
+    <span className="text-gray-400 font-normal ml-1">Inc.</span>
+  </div>
+)
+
+// 3D Tilt Card Component - マウス追従で3D傾斜
+const TiltCard = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  const mouseXSpring = useSpring(x)
+  const mouseYSpring = useSpring(y)
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['17.5deg', '-17.5deg'])
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-17.5deg', '17.5deg'])
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return
+    const rect = ref.current.getBoundingClientRect()
+    const width = rect.width
+    const height = rect.height
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+    const xPct = mouseX / width - 0.5
+    const yPct = mouseY / height - 0.5
+    x.set(xPct)
+    y.set(yPct)
+  }
+
+  const handleMouseLeave = () => {
+    x.set(0)
+    y.set(0)
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateY,
+        rotateX,
+        transformStyle: 'preserve-3d',
+      }}
+      className={`${className}`}
+    >
+      <div style={{ transform: 'translateZ(75px)', transformStyle: 'preserve-3d' }}>
+        {children}
+      </div>
+    </motion.div>
+  )
+}
+
+// Glitch Text Effect - サイバーパンク風グリッチ
+const GlitchText = ({ text, className = '' }: { text: string; className?: string }) => {
+  return (
+    <div className={`relative inline-block ${className}`}>
+      <span className="relative z-10">{text}</span>
+      <span
+        className="absolute top-0 left-0 -ml-[2px] text-cyan-400 opacity-70 animate-pulse"
+        style={{ clipPath: 'inset(0 0 50% 0)' }}
+        aria-hidden="true"
+      >
+        {text}
+      </span>
+      <span
+        className="absolute top-0 left-0 ml-[2px] text-purple-400 opacity-70 animate-pulse"
+        style={{ clipPath: 'inset(50% 0 0 0)', animationDelay: '0.1s' }}
+        aria-hidden="true"
+      >
+        {text}
+      </span>
+    </div>
+  )
+}
+
+// Typing animation hook
+const useTypingEffect = (texts: string[], typingSpeed = 100, deletingSpeed = 50, pauseTime = 2000) => {
+  const [displayText, setDisplayText] = useState('')
+  const [textIndex, setTextIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentText = texts[textIndex]
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        if (displayText.length < currentText.length) {
+          setDisplayText(currentText.slice(0, displayText.length + 1))
+        } else {
+          setTimeout(() => setIsDeleting(true), pauseTime)
+        }
+      } else {
+        if (displayText.length > 0) {
+          setDisplayText(displayText.slice(0, -1))
+        } else {
+          setIsDeleting(false)
+          setTextIndex((prev) => (prev + 1) % texts.length)
+        }
+      }
+    }, isDeleting ? deletingSpeed : typingSpeed)
+
+    return () => clearTimeout(timeout)
+  }, [displayText, isDeleting, textIndex, texts, typingSpeed, deletingSpeed, pauseTime])
+
+  return displayText
+}
+
+// Magnetic Button - マウスに吸い寄せられるボタン
+const MagneticButton = ({ children, className = '', href }: { children: React.ReactNode; className?: string; href: string }) => {
+  const ref = useRef<HTMLAnchorElement>(null)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!ref.current) return
+    const rect = ref.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    x.set((e.clientX - centerX) * 0.3)
+    y.set((e.clientY - centerY) * 0.3)
+  }
+
+  const handleMouseLeave = () => {
+    x.set(0)
+    y.set(0)
+  }
+
+  const springX = useSpring(x, { stiffness: 150, damping: 15 })
+  const springY = useSpring(y, { stiffness: 150, damping: 15 })
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: springX, y: springY }}
+      className={className}
+    >
+      {children}
+    </motion.a>
+  )
+}
 
 // Star component for the starfield
 const StarField = ({ count = 150 }: { count?: number }) => {
@@ -184,20 +334,14 @@ const NebulaEffect = () => {
   )
 }
 
-// Sun component with corona effect
+// Sun component
 const Sun = () => {
   return (
     <motion.div
       className="absolute hidden md:block"
       style={{ right: '8%', top: '18%' }}
-      animate={{
-        scale: [1, 1.05, 1],
-      }}
-      transition={{
-        duration: 4,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
+      animate={{ scale: [1, 1.05, 1] }}
+      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
     >
       <div
         className="absolute inset-0 w-28 h-28 lg:w-36 lg:h-36 rounded-full"
@@ -220,30 +364,20 @@ const Sun = () => {
             '0 0 60px rgba(251,191,36,0.6), 0 0 120px rgba(251,146,60,0.4)',
           ],
         }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       />
     </motion.div>
   )
 }
 
-// Moon component with craters
+// Moon component
 const Moon = () => {
   return (
     <motion.div
       className="absolute hidden md:block"
       style={{ left: '10%', top: '25%' }}
-      animate={{
-        y: [0, -15, 0],
-      }}
-      transition={{
-        duration: 8,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
+      animate={{ y: [0, -15, 0] }}
+      transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
     >
       <div
         className="absolute inset-0 w-16 h-16 lg:w-20 lg:h-20 rounded-full"
@@ -268,21 +402,14 @@ const Moon = () => {
   )
 }
 
-// Planet component (Saturn-like with rings)
+// Planet component
 const Planet = () => {
   return (
     <motion.div
       className="absolute hidden lg:block"
       style={{ right: '12%', bottom: '15%' }}
-      animate={{
-        y: [0, 20, 0],
-        rotate: [0, 5, 0],
-      }}
-      transition={{
-        duration: 12,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
+      animate={{ y: [0, 20, 0], rotate: [0, 5, 0] }}
+      transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
     >
       <div
         className="absolute inset-0 w-24 h-24 rounded-full"
@@ -329,48 +456,17 @@ const TechGrid = () => {
   )
 }
 
-// Floating code snippets
-const FloatingCode = () => {
-  const codeSnippets = [
-    'SELECT * FROM data',
-    'import pandas as pd',
-    'def analyze():',
-    'model.fit(X, y)',
-    'GROUP BY category',
-  ]
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
-      {codeSnippets.map((code, i) => (
-        <motion.div
-          key={i}
-          className="absolute text-xs font-mono text-cyan-400/20 whitespace-nowrap"
-          style={{
-            left: `${10 + (i * 18)}%`,
-            top: `${25 + (i * 12)}%`,
-          }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{
-            opacity: [0, 0.3, 0],
-            x: [-20, 20, -20],
-          }}
-          transition={{
-            duration: 10,
-            delay: i * 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          {code}
-        </motion.div>
-      ))}
-    </div>
-  )
-}
-
 export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const typingText = useTypingEffect([
+    '市民データサイエンティスト',
+    'Citizen Data Scientist',
+    'データ分析のプロ',
+    'AI活用の達人',
+    'DX推進リーダー',
+  ], 80, 40, 2000)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -390,14 +486,7 @@ export default function HomePage() {
       }`}>
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <Image
-              src="/chapiko-logo.png"
-              alt="Chapiko株式会社"
-              width={144}
-              height={47}
-              className="h-8 md:h-10 w-auto"
-              priority
-            />
+            <ChapikoLogo className="text-xl md:text-2xl" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -415,11 +504,7 @@ export default function HomePage() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button
-              variant="ghost"
-              asChild
-              className="text-gray-300 hover:text-cyan-400 hover:bg-cyan-500/10"
-            >
+            <Button variant="ghost" asChild className="text-gray-300 hover:text-cyan-400 hover:bg-cyan-500/10">
               <Link href="/login">ログイン</Link>
             </Button>
             <Button asChild className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all">
@@ -488,22 +573,15 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen text-white flex items-center overflow-hidden">
-        {/* Deep space background */}
+        {/* Background effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0a0a1a]" />
-
-        {/* Effects */}
         <StarField count={200} />
         <ShootingStars />
         <NebulaEffect />
-
-        {/* Celestial bodies */}
         <Sun />
         <Moon />
         <Planet />
-
-        {/* Tech elements */}
         <TechGrid />
-        <FloatingCode />
 
         {/* Radial glow */}
         <div
@@ -514,12 +592,7 @@ export default function HomePage() {
         />
 
         <div className="relative z-10 container mx-auto px-6 pt-24 pb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-4xl mx-auto"
-          >
+          <div className="text-center max-w-5xl mx-auto" style={{ perspective: '1000px' }}>
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -533,23 +606,46 @@ export default function HomePage() {
               </span>
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8">
-              <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-                データの宇宙へ
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                旅立とう
-              </span>
-            </h1>
+            {/* 3D Tilt Hero Card - メインのインパクト要素 */}
+            <TiltCard className="mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="relative p-8 md:p-12 rounded-2xl bg-gradient-to-br from-purple-900/30 via-transparent to-cyan-900/30 border border-purple-500/20 backdrop-blur-sm"
+              >
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 blur-xl" />
 
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-2xl mx-auto mb-6 leading-relaxed">
-              市民データサイエンティストを量産し、
-              <br className="hidden sm:block" />
-              <span className="text-cyan-400">すべてのビジネスパーソン</span>をデータ人材へ。
-            </p>
+                <h1 className="relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+                  <GlitchText
+                    text="データの宇宙へ"
+                    className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent block mb-2"
+                  />
+                  <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    旅立とう
+                  </span>
+                </h1>
 
-            {/* Stats bar */}
+                {/* Typing effect */}
+                <div className="h-12 md:h-14 flex items-center justify-center mb-6">
+                  <span className="text-xl md:text-2xl lg:text-3xl font-medium">
+                    あなたも
+                    <span className="text-cyan-400 font-bold mx-2">{typingText}</span>
+                    <span className="animate-pulse">|</span>
+                    に
+                  </span>
+                </div>
+
+                <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                  エンジニアでなくても、データの力を手に入れられる。
+                  <br className="hidden sm:block" />
+                  <span className="text-cyan-400">すべてのビジネスパーソン</span>をデータ人材へ。
+                </p>
+              </motion.div>
+            </TiltCard>
+
+            {/* Stats */}
             <motion.div
               className="flex flex-wrap justify-center gap-4 md:gap-8 mb-10 text-sm"
               initial={{ opacity: 0 }}
@@ -570,17 +666,15 @@ export default function HomePage() {
               </div>
             </motion.div>
 
+            {/* CTA Buttons - Magnetic effect */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button
-                asChild
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-8 py-6 text-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105"
+              <MagneticButton
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-8 py-4 text-lg rounded-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all"
               >
-                <Link href="/signup" className="flex items-center gap-2">
-                  <Rocket className="w-5 h-5" />
-                  無料で始める
-                </Link>
-              </Button>
+                <Rocket className="w-5 h-5" />
+                無料で始める
+              </MagneticButton>
               <Button
                 asChild
                 variant="outline"
@@ -614,10 +708,10 @@ export default function HomePage() {
                 </Link>
               ))}
             </motion.div>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Scroll indicator - clickable */}
+        {/* Scroll indicator */}
         <motion.button
           onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center cursor-pointer group"
@@ -640,15 +734,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <div className="flex justify-center mb-6">
-              <Image
-                src="/chapiko-logo.png"
-                alt="Chapiko株式会社"
-                width={200}
-                height={66}
-                className="h-12 md:h-16 w-auto"
-              />
-            </div>
+            <ChapikoLogo className="text-3xl md:text-4xl justify-center flex mb-6" />
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Our Mission
             </h2>
@@ -744,34 +830,10 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {
-                number: '01',
-                icon: Bot,
-                title: 'AI活用術',
-                description: 'ChatGPT、Claude、Geminiなど生成AIを使いこなし、業務効率を劇的に改善',
-                color: '#a855f7'
-              },
-              {
-                number: '02',
-                icon: BarChart,
-                title: 'データ分析',
-                description: 'Excel→SQL→Python→機械学習へステップアップ。実務で使える分析力を習得',
-                color: '#22d3ee'
-              },
-              {
-                number: '03',
-                icon: Zap,
-                title: '業務自動化',
-                description: 'RPAやスクリプトで単純作業を自動化。生産性を10倍に向上',
-                color: '#eab308'
-              },
-              {
-                number: '04',
-                icon: LineChart,
-                title: 'データ可視化',
-                description: 'Tableau、PowerBIで説得力のあるダッシュボードを作成。意思決定を加速',
-                color: '#22c55e'
-              }
+              { number: '01', icon: Bot, title: 'AI活用術', description: 'ChatGPT、Claude、Geminiなど生成AIを使いこなし、業務効率を劇的に改善', color: '#a855f7' },
+              { number: '02', icon: BarChart, title: 'データ分析', description: 'Excel→SQL→Python→機械学習へステップアップ。実務で使える分析力を習得', color: '#22d3ee' },
+              { number: '03', icon: Zap, title: '業務自動化', description: 'RPAやスクリプトで単純作業を自動化。生産性を10倍に向上', color: '#eab308' },
+              { number: '04', icon: LineChart, title: 'データ可視化', description: 'Tableau、PowerBIで説得力のあるダッシュボードを作成。意思決定を加速', color: '#22c55e' }
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -865,27 +927,9 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {[
-              {
-                icon: Sparkles,
-                title: 'AI投稿生成',
-                description: 'SNS投稿をAIで自動生成。マーケティング業務を効率化',
-                link: '/generate',
-                gradient: 'from-pink-500 to-purple-500'
-              },
-              {
-                icon: Database,
-                title: 'データ管理',
-                description: '生成したコンテンツをNotionに保存。一元管理で効率アップ',
-                link: '/dashboard',
-                gradient: 'from-cyan-500 to-blue-500'
-              },
-              {
-                icon: Brain,
-                title: '学習リソース',
-                description: '段階的なカリキュラムで、確実にスキルアップ',
-                link: '/learning',
-                gradient: 'from-purple-500 to-cyan-500'
-              }
+              { icon: Sparkles, title: 'AI投稿生成', description: 'SNS投稿をAIで自動生成。マーケティング業務を効率化', link: '/generate', gradient: 'from-pink-500 to-purple-500' },
+              { icon: Database, title: 'データ管理', description: '生成したコンテンツをNotionに保存。一元管理で効率アップ', link: '/dashboard', gradient: 'from-cyan-500 to-blue-500' },
+              { icon: Brain, title: '学習リソース', description: '段階的なカリキュラムで、確実にスキルアップ', link: '/learning', gradient: 'from-purple-500 to-cyan-500' }
             ].map((tool, i) => (
               <motion.div
                 key={i}
@@ -921,13 +965,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a0a2a] to-[#0a0a1a]" />
         <StarField count={100} />
         <NebulaEffect />
-
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.3) 0%, transparent 50%)',
-          }}
-        />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.3) 0%, transparent 50%)' }} />
 
         <div className="relative z-10 container mx-auto max-w-4xl text-center">
           <motion.div
@@ -937,10 +975,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <motion.div
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 5, -5, 0]
-              }}
+              animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 4, repeat: Infinity }}
               className="inline-block mb-8"
             >
@@ -961,16 +996,13 @@ export default function HomePage() {
               <br />
               無料で今すぐ始められます。
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-10 md:px-12 py-6 text-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105"
+            <MagneticButton
+              href="/signup"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold px-10 md:px-12 py-4 md:py-5 text-lg rounded-lg shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all"
             >
-              <Link href="/signup" className="flex items-center gap-2">
-                <Rocket className="w-5 h-5" />
-                無料で始める
-              </Link>
-            </Button>
+              <Rocket className="w-5 h-5" />
+              無料で始める
+            </MagneticButton>
             <p className="text-sm text-gray-500 mt-6">クレジットカード不要 • 3分で登録完了</p>
           </motion.div>
         </div>
@@ -983,89 +1015,42 @@ export default function HomePage() {
 
         <div className="relative z-10 container mx-auto max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
-            {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <div className="mb-4">
-                <Image
-                  src="/chapiko-logo.png"
-                  alt="Chapiko株式会社"
-                  width={160}
-                  height={52}
-                  className="h-10 w-auto"
-                />
-              </div>
+              <ChapikoLogo className="text-xl mb-4" />
               <p className="text-gray-400 text-sm leading-relaxed">
                 市民データサイエンティストを量産し、
                 すべてのビジネスパーソンをデータ人材へ。
               </p>
             </div>
 
-            {/* Content */}
             <div>
               <h4 className="text-white font-semibold mb-4">Content</h4>
               <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/blog" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <BookOpen size={14} />
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/learning" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <GraduationCap size={14} />
-                    Learning
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/books" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <Library size={14} />
-                    Books
-                  </Link>
-                </li>
+                <li><Link href="/blog" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><BookOpen size={14} />Blog</Link></li>
+                <li><Link href="/learning" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><GraduationCap size={14} />Learning</Link></li>
+                <li><Link href="/books" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><Library size={14} />Books</Link></li>
               </ul>
             </div>
 
-            {/* Tools */}
             <div>
               <h4 className="text-white font-semibold mb-4">Tools</h4>
               <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/generate" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <Wand2 size={14} />
-                    AI Generator
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                    <Database size={14} />
-                    Dashboard
-                  </Link>
-                </li>
+                <li><Link href="/generate" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><Wand2 size={14} />AI Generator</Link></li>
+                <li><Link href="/dashboard" className="text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><Database size={14} />Dashboard</Link></li>
               </ul>
             </div>
 
-            {/* Account */}
             <div>
               <h4 className="text-white font-semibold mb-4">Account</h4>
               <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/login" className="text-gray-400 hover:text-cyan-400 transition-colors">
-                    ログイン
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/signup" className="text-gray-400 hover:text-cyan-400 transition-colors">
-                    新規登録
-                  </Link>
-                </li>
+                <li><Link href="/login" className="text-gray-400 hover:text-cyan-400 transition-colors">ログイン</Link></li>
+                <li><Link href="/signup" className="text-gray-400 hover:text-cyan-400 transition-colors">新規登録</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-purple-500/20 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-500">
-              © 2024 Chapiko Inc. All rights reserved.
-            </p>
+            <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-500">
               <Link href="#" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
               <Link href="#" className="hover:text-cyan-400 transition-colors">利用規約</Link>
