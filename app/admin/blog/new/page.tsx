@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Eye, Trash2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Eye, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,17 +19,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import ImageUploader from '@/components/admin/ImageUploader'
 import MarkdownEditor from '@/components/admin/MarkdownEditor'
 import { STORAGE_BUCKETS } from '@/lib/storage'
@@ -61,19 +50,15 @@ const categories = [
   '機械学習',
 ]
 
-export default function BlogEditPage() {
-  const params = useParams()
+export default function BlogNewPage() {
   const router = useRouter()
-  const id = params?.id as string
-
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [autoSaving, setAutoSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [tagInput, setTagInput] = useState('')
-  const [hasChanges, setHasChanges] = useState(false)
+  const [draftId, setDraftId] = useState<string | null>(null)
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const [originalSlug, setOriginalSlug] = useState<string>('')
+  const [hasChanges, setHasChanges] = useState(false)
 
   const [form, setForm] = useState<BlogPostForm>({
     title: '',
@@ -86,66 +71,38 @@ export default function BlogEditPage() {
     is_published: false,
   })
 
-  useEffect(() => {
-    if (id) {
-      fetchPost()
-    }
-  }, [id])
-
-  const fetchPost = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-
-      if (error) throw error
-
-      if (data) {
-        setForm({
-          title: data.title || '',
-          slug: data.slug || '',
-          excerpt: data.excerpt || '',
-          content: data.content || '',
-          cover_image: data.cover_image,
-          category: data.category,
-          tags: data.tags || [],
-          is_published: data.is_published || false,
-        })
-        setOriginalSlug(data.slug || '')
-      } else {
-        toast.error('記事が見つかりません')
-        router.push('/admin/blog')
-      }
-    } catch (error) {
-      console.error('Failed to fetch post:', error)
-      toast.error('記事の取得に失敗しました')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   // 自動保存（30秒ごと）
   const autoSave = useCallback(async () => {
     if (!form.title || !hasChanges) return
 
     setAutoSaving(true)
     try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .update({
-          title: form.title,
-          slug: form.slug,
-          excerpt: form.excerpt,
-          content: form.content,
-          cover_image: form.cover_image,
-          category: form.category,
-          tags: form.tags,
-        })
-        .eq('id', id)
+      const postData = {
+        ...form,
+        slug: form.slug || generateSlug(form.title),
+        is_published: false,
+        view_count: 0,
+      }
 
-      if (error) throw error
+      if (draftId) {
+        const { error } = await supabase
+          .from('blog_posts')
+          .update(postData)
+          .eq('id', draftId)
+
+        if (error) throw error
+      } else {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .insert([postData])
+          .select()
+          .single()
+
+        if (error) throw error
+        if (data) {
+          setDraftId(data.id)
+        }
+      }
 
       setLastSaved(new Date())
       setHasChanges(false)
@@ -154,7 +111,7 @@ export default function BlogEditPage() {
     } finally {
       setAutoSaving(false)
     }
-  }, [form, id, hasChanges])
+  }, [form, draftId, hasChanges])
 
   // 30秒ごとの自動保存タイマー設定
   useEffect(() => {
@@ -175,14 +132,15 @@ export default function BlogEditPage() {
     }
   }, [autoSave, hasChanges, form.title])
 
+  // フォーム変更時にhasChangesをtrueに
   const updateForm = (updates: Partial<BlogPostForm>) => {
     setForm(prev => ({ ...prev, ...updates }))
     setHasChanges(true)
   }
 
   const handleTitleChange = (title: string) => {
-    // 既存記事の場合はスラッグを自動変更しない（手動変更は可能）
-    updateForm({ title })
+    const newSlug = generateSlug(title)
+    updateForm({ title, slug: newSlug })
   }
 
   const handleAddTag = () => {
@@ -202,33 +160,37 @@ export default function BlogEditPage() {
       return
     }
 
-    if (!form.slug) {
-      toast.error('スラッグは必須です')
+    const slug = form.slug || generateSlug(form.title)
+    if (!slug) {
+      toast.error('スラッグを入力してください')
       return
     }
 
     setSaving(true)
     try {
       const postData = {
-        title: form.title,
-        slug: form.slug,
-        excerpt: form.excerpt,
-        content: form.content,
-        cover_image: form.cover_image,
-        category: form.category,
-        tags: form.tags,
+        ...form,
+        slug,
         is_published: publish,
         published_at: publish ? new Date().toISOString() : null,
+        view_count: 0,
       }
 
-      const { error } = await supabase
-        .from('blog_posts')
-        .update(postData)
-        .eq('id', id)
+      if (draftId) {
+        const { error } = await supabase
+          .from('blog_posts')
+          .update(postData)
+          .eq('id', draftId)
 
-      if (error) throw error
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('blog_posts')
+          .insert([postData])
 
-      setHasChanges(false)
+        if (error) throw error
+      }
+
       toast.success(publish ? '記事を公開しました' : '下書きを保存しました')
       router.push('/admin/blog')
     } catch (error: unknown) {
@@ -243,34 +205,6 @@ export default function BlogEditPage() {
     }
   }
 
-  const handleDelete = async () => {
-    try {
-      const { error } = await supabase
-        .from('blog_posts')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
-
-      toast.success('記事を削除しました')
-      router.push('/admin/blog')
-    } catch (error) {
-      console.error('Failed to delete post:', error)
-      toast.error('削除に失敗しました')
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
@@ -282,7 +216,7 @@ export default function BlogEditPage() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-black">記事編集</h1>
+            <h1 className="text-3xl font-bold text-black">新規記事作成</h1>
             {lastSaved && (
               <p className="text-sm text-gray-500 mt-1">
                 最終自動保存: {lastSaved.toLocaleTimeString('ja-JP')}
@@ -341,33 +275,6 @@ export default function BlogEditPage() {
             </SheetContent>
           </Sheet>
 
-          {/* 削除ボタン */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50">
-                <Trash2 size={16} className="mr-2" />
-                削除
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>本当に削除しますか？</AlertDialogTitle>
-                <AlertDialogDescription>
-                  この操作は取り消せません。記事「{form.title}」は完全に削除されます。
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>キャンセル</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-red-500 hover:bg-red-600"
-                >
-                  削除
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-
           <Button
             onClick={() => handleSave(false)}
             disabled={saving}
@@ -381,7 +288,7 @@ export default function BlogEditPage() {
             className="bg-green-500 hover:bg-green-600"
           >
             <Save size={16} className="mr-2" />
-            {form.is_published ? '更新して公開' : '公開'}
+            公開
           </Button>
         </div>
       </div>
@@ -414,11 +321,9 @@ export default function BlogEditPage() {
               <p className="text-sm text-gray-500 mt-1">
                 URL: /blog/{form.slug || 'slug'}
               </p>
-              {form.slug !== originalSlug && originalSlug && (
-                <p className="text-xs text-yellow-600 mt-1">
-                  スラッグを変更すると、既存のURLが無効になります
-                </p>
-              )}
+              <p className="text-xs text-gray-400 mt-1">
+                タイトルから自動生成されます（日本語はローマ字に変換）
+              </p>
             </div>
 
             <div>
@@ -526,14 +431,12 @@ export default function BlogEditPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span className="text-sm text-gray-600">ステータス</span>
-                <Badge
-                  className={form.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
-                >
-                  {form.is_published ? '公開中' : '下書き'}
+                <Badge variant={form.is_published ? 'default' : 'secondary'}>
+                  {form.is_published ? '公開' : '下書き'}
                 </Badge>
               </div>
               {hasChanges && (
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                   <span className="text-sm text-yellow-700">未保存の変更があります</span>
                 </div>
               )}
