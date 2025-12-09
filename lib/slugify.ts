@@ -75,21 +75,19 @@ const kanjiToReading: { [key: string]: string } = {
   '問': 'mon', '題': 'dai', '解': 'kai', '決': 'ketsu', '新': 'shin',
   '時': 'ji', '代': 'dai', '必': 'hitsu', '要': 'you', '技': 'gi',
   '最': 'sai', '強': 'kyou', '完': 'kan', '全': 'zen', '攻': 'kou',
-  '略': 'ryaku', '使': 'shi', 'い': 'i', '方': 'kata', 'の': 'no',
-  'で': 'de', 'を': 'wo', 'に': 'ni', 'は': 'ha', 'と': 'to',
-  '始': 'haji', 'め': 'me', 'る': 'ru',
+  '使': 'shi', '始': 'haji',
   // プログラミング
   '開': 'kai', '発': 'hatsu', '環': 'kan', '境': 'kyou', '構': 'kou',
   '築': 'chiku', '設': 'setsu', '定': 'tei', '変': 'hen', '更': 'kou',
   '追': 'tsui', '加': 'ka', '削': 'saku', '除': 'jo', '修': 'shuu',
-  '正': 'sei', '更': 'kou', '連': 'ren', '携': 'kei', '外': 'gai',
+  '正': 'sei', '連': 'ren', '携': 'kei', '外': 'gai',
   '部': 'bu', '内': 'nai', '関': 'kan', '係': 'kei',
   // データ関連
   '収': 'shuu', '集': 'shuu', '整': 'sei', '形': 'kei', '前': 'mae',
   '後': 'go', '結': 'ketsu', '果': 'ka', '出': 'shutsu', '力': 'ryoku',
   // AI関連
   '言': 'gen', '語': 'go', '画': 'ga', '像': 'zou', '認': 'nin',
-  '識': 'shiki', '検': 'ken', '出': 'shutsu', '予': 'yo', '測': 'soku',
+  '識': 'shiki', '検': 'ken', '予': 'yo', '測': 'soku',
   '推': 'sui', '論': 'ron', '型': 'gata', '大': 'dai', '規': 'ki',
   '模': 'mo',
 }
