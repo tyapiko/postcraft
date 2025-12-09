@@ -20,8 +20,8 @@ export default function Footer() {
     company: [
       { label: 'About', href: '#' },
       { label: 'Contact', href: '#' },
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
     ],
   }
 
@@ -107,10 +107,10 @@ export default function Footer() {
               &copy; {currentYear} Citizen DS. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
                 Terms of Service
               </Link>
             </div>
