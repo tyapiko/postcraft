@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, Edit, Trash2, Search, Eye, EyeOff, Grid, List, Star, Book } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -32,7 +31,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { toast } from 'sonner'
+import { useResourceManagement } from '@/lib/hooks/useResourceManagement'
+import { BOOK_CATEGORIES, DIFFICULTIES } from '@/lib/constants'
+import { getDifficultyColor, getPublishStatusClass, getPublishStatusLabel } from '@/lib/ui-utils'
 
 interface Book {
   id: string
@@ -48,23 +49,27 @@ interface Book {
   sort_order: number
 }
 
-const difficulties = ['初級', '中級', '上級']
-const categories = ['Python入門', 'データ分析', 'AI', 'ビジネス', 'Excel', 'プログラミング']
-
 export default function BooksManagementPage() {
-  const [books, setBooks] = useState<Book[]>([])
+  // 共通フックを使用
+  const {
+    items: books,
+    loading,
+    deleteId,
+    setDeleteId,
+    handleDelete,
+    togglePublish
+  } = useResourceManagement<Book>({
+    tableName: 'books',
+    orderBy: { column: 'sort_order', ascending: true }
+  })
+
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([])
-  const [loading, setLoading] = useState(true)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('')
   const [difficultyFilter, setDifficultyFilter] = useState<string>('')
 
-  useEffect(() => {
-    fetchBooks()
-  }, [])
-
+  // フィルタリング処理
   useEffect(() => {
     let filtered = [...books]
 
@@ -86,73 +91,7 @@ export default function BooksManagementPage() {
     setFilteredBooks(filtered)
   }, [searchQuery, categoryFilter, difficultyFilter, books])
 
-  const fetchBooks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('books')
-        .select('*')
-        .order('sort_order', { ascending: true })
-
-      if (error) throw error
-      setBooks(data || [])
-      setFilteredBooks(data || [])
-    } catch (error) {
-      console.error('Failed to fetch books:', error)
-      toast.error('書籍の取得に失敗しました')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!deleteId) return
-
-    try {
-      const { error } = await supabase
-        .from('books')
-        .delete()
-        .eq('id', deleteId)
-
-      if (error) throw error
-
-      setBooks(books.filter(b => b.id !== deleteId))
-      toast.success('書籍を削除しました')
-    } catch (error) {
-      console.error('Failed to delete book:', error)
-      toast.error('削除に失敗しました')
-    } finally {
-      setDeleteId(null)
-    }
-  }
-
-  const togglePublish = async (id: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('books')
-        .update({ is_published: !currentStatus })
-        .eq('id', id)
-
-      if (error) throw error
-
-      setBooks(books.map(b =>
-        b.id === id ? { ...b, is_published: !currentStatus } : b
-      ))
-      toast.success(!currentStatus ? '書籍を公開しました' : '書籍を非公開にしました')
-    } catch (error) {
-      console.error('Failed to toggle publish:', error)
-      toast.error('公開状態の変更に失敗しました')
-    }
-  }
-
-  const getDifficultyColor = (difficulty: string | null) => {
-    switch (difficulty) {
-      case '初級': return 'bg-green-100 text-green-800'
-      case '中級': return 'bg-yellow-100 text-yellow-800'
-      case '上級': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
+  // 星評価のレンダリング
   const renderStars = (rating: number | null) => {
     if (!rating) return '-'
     return (
@@ -212,7 +151,7 @@ export default function BooksManagementPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">すべて</SelectItem>
-            {categories.map(c => (
+            {BOOK_CATEGORIES.map(c => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
             ))}
           </SelectContent>
@@ -223,7 +162,7 @@ export default function BooksManagementPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">すべて</SelectItem>
-            {difficulties.map(d => (
+            {DIFFICULTIES.map(d => (
               <SelectItem key={d} value={d}>{d}</SelectItem>
             ))}
           </SelectContent>
@@ -301,14 +240,8 @@ export default function BooksManagementPage() {
                     </TableCell>
                     <TableCell>{renderStars(book.rating)}</TableCell>
                     <TableCell>
-                      <Badge
-                        className={
-                          book.is_published
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }
-                      >
-                        {book.is_published ? '公開' : '非公開'}
+                      <Badge className={getPublishStatusClass(book.is_published)}>
+                        {getPublishStatusLabel(book.is_published)}
                       </Badge>
                     </TableCell>
                     <TableCell>
