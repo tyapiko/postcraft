@@ -127,3 +127,70 @@ export type QuizWithQuestions = Quiz & {
 export type QuizAttemptWithAnswers = QuizAttempt & {
   answers: QuizAnswer[]
 }
+
+// Organization関連の型定義
+export type OrganizationRole = 'owner' | 'admin' | 'instructor' | 'member'
+
+export type Organization = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  logo_url: string | null
+  owner_id: string
+  plan: 'pro' | 'enterprise'
+  max_members: number
+  created_at: string
+  updated_at: string
+}
+
+export type OrganizationMember = {
+  id: string
+  organization_id: string
+  user_id: string
+  role: OrganizationRole
+  joined_at: string
+}
+
+export type OrganizationInvitation = {
+  id: string
+  organization_id: string
+  email: string
+  role: Exclude<OrganizationRole, 'owner'>
+  invited_by: string
+  token: string
+  expires_at: string
+  accepted_at: string | null
+  created_at: string
+}
+
+export type OrganizationCourse = {
+  id: string
+  organization_id: string
+  course_id: string
+  assigned_at: string
+  assigned_by: string | null
+}
+
+// 拡張型
+export type OrganizationWithMembers = Organization & {
+  members: (OrganizationMember & { user?: { email: string; display_name: string | null } })[]
+  member_count: number
+}
+
+export type OrganizationMemberWithUser = OrganizationMember & {
+  user: { email: string; display_name: string | null }
+}
+
+export type MemberProgress = {
+  user_id: string
+  email: string
+  display_name: string | null
+  enrollments: {
+    course_id: string
+    course_title: string
+    progress_percent: number
+    completed_lessons: number
+    total_lessons: number
+  }[]
+}
