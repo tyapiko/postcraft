@@ -34,6 +34,7 @@ const navItems = [
   { href: '/learning', label: 'Learning', icon: GraduationCap },
   { href: '/books', label: 'Books', icon: Library },
   { href: '/generate', label: 'AI Generator', icon: Wand2 },
+  { href: '/pricing', label: 'Pricing', icon: Sparkles },
 ]
 
 // Chapiko Logo component

@@ -2,35 +2,39 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { supabase, Profile, Content } from '@/lib/supabase'
+import { supabase, Content } from '@/lib/supabase'
+import { PLANS } from '@/lib/plans'
 import { DashboardLayout } from '@/components/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import Link from 'next/link'
-import { Sparkles, TrendingUp } from 'lucide-react'
+import {
+  Sparkles,
+  TrendingUp,
+  Zap,
+  Crown,
+  Star,
+  BookOpen,
+  GraduationCap,
+  ArrowRight,
+  Rocket
+} from 'lucide-react'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const { user, profile, plan, remainingAIGenerations, isPro, isEnterprise, canAccess } = useAuth()
   const [recentContents, setRecentContents] = useState<Content[]>([])
   const [loading, setLoading] = useState(true)
+
+  const currentPlan = PLANS[plan]
 
   useEffect(() => {
     if (!user) return
 
     const loadData = async () => {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (profileData) {
-        setProfile(profileData)
-      }
-
       const { data: contentsData } = await supabase
         .from('contents')
         .select('*')
@@ -48,10 +52,36 @@ export default function DashboardPage() {
     loadData()
   }, [user])
 
+  const getPlanIcon = () => {
+    switch (plan) {
+      case 'enterprise': return Crown
+      case 'pro': return Zap
+      default: return Star
+    }
+  }
+
+  const getPlanColor = () => {
+    switch (plan) {
+      case 'enterprise': return 'from-purple-500 to-pink-500'
+      case 'pro': return 'from-cyan-500 to-blue-500'
+      default: return 'from-gray-500 to-gray-600'
+    }
+  }
+
+  const PlanIcon = getPlanIcon()
+  const aiLimit = currentPlan.limitations.aiGenerationLimit
+  const usedGenerations = profile?.generation_count || 0
+  const usagePercent = aiLimit === -1 ? 0 : Math.min(100, (usedGenerations / aiLimit) * 100)
+
   if (loading) {
     return (
       <DashboardLayout>
-        <div>読み込み中...</div>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400">読み込み中...</p>
+          </div>
+        </div>
       </DashboardLayout>
     )
   }
@@ -59,30 +89,54 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">ダッシュボード</h1>
-          <p className="text-muted-foreground">
-            ようこそ、{profile?.display_name || 'ゲスト'}さん
-          </p>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">ダッシュボード</h1>
+            <p className="text-muted-foreground">
+              ようこそ、{profile?.display_name || 'ゲスト'}さん
+            </p>
+          </div>
+
+          {/* Plan Badge */}
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${getPlanColor()} text-white`}>
+            <PlanIcon className="w-4 h-4" />
+            <span className="font-semibold">{currentPlan.name}プラン</span>
+          </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
+        {/* Stats Cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* AI Generation Card */}
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10" />
+            <CardHeader className="relative">
               <CardTitle className="flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5" />
-                今月の生成数
+                <Sparkles className="mr-2 h-5 w-5 text-purple-400" />
+                AI生成
               </CardTitle>
+              <CardDescription>今月の使用状況</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold">{profile?.generation_count || 0}</div>
-              <p className="text-sm text-muted-foreground mt-2">
-                プラン: {profile?.plan === 'free' ? 'Free' : profile?.plan === 'starter' ? 'Starter' : 'Pro'}
+            <CardContent className="relative">
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-4xl font-bold">{usedGenerations}</span>
+                <span className="text-muted-foreground">
+                  / {aiLimit === -1 ? '∞' : aiLimit}回
+                </span>
+              </div>
+              {aiLimit !== -1 && (
+                <Progress value={usagePercent} className="h-2 mb-2" />
+              )}
+              <p className="text-sm text-muted-foreground">
+                {remainingAIGenerations === Infinity
+                  ? '無制限'
+                  : `残り ${remainingAIGenerations} 回`}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="gradient-bg">
+          {/* Quick Action Card */}
+          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-600 to-cyan-600">
             <CardHeader>
               <CardTitle className="text-white">新しいコンテンツを生成</CardTitle>
               <CardDescription className="text-white/80">
@@ -90,7 +144,7 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full bg-white text-blue-600 hover:bg-white/90">
+              <Button asChild className="w-full bg-white text-purple-600 hover:bg-white/90">
                 <Link href="/generate">
                   <Sparkles className="mr-2 h-4 w-4" />
                   生成する
@@ -98,8 +152,85 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Learning Card */}
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center">
+                <GraduationCap className="mr-2 h-5 w-5 text-cyan-400" />
+                学習
+              </CardTitle>
+              <CardDescription>スキルアップしよう</CardDescription>
+            </CardHeader>
+            <CardContent className="relative space-y-3">
+              <Button asChild variant="outline" className="w-full justify-between">
+                <Link href="/learning">
+                  コースを見る
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full justify-between">
+                <Link href="/blog">
+                  ブログを読む
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Upgrade Banner (for free users) */}
+        {plan === 'free' && (
+          <Card className="relative overflow-hidden border-purple-500/30 bg-gradient-to-r from-purple-900/20 to-cyan-900/20">
+            <CardContent className="flex flex-col md:flex-row items-center justify-between gap-4 py-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500">
+                  <Rocket className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">プロプランにアップグレード</h3>
+                  <p className="text-sm text-muted-foreground">
+                    全コースへのアクセス、LMS管理機能、AI生成100回/月など
+                  </p>
+                </div>
+              </div>
+              <Button asChild className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500">
+                <Link href="/pricing">
+                  プランを見る
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* LMS Access Banner (for pro+ users) */}
+        {isPro && (
+          <Card className="relative overflow-hidden border-cyan-500/30 bg-gradient-to-r from-cyan-900/20 to-blue-900/20">
+            <CardContent className="flex flex-col md:flex-row items-center justify-between gap-4 py-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500">
+                  <Crown className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">LMS管理機能</h3>
+                  <p className="text-sm text-muted-foreground">
+                    自社コースの作成・受講者管理ができます
+                  </p>
+                </div>
+              </div>
+              <Button asChild variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/10">
+                <Link href="/admin">
+                  管理画面へ
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recent Contents */}
         <Card>
           <CardHeader>
             <CardTitle>最近の生成履歴</CardTitle>
@@ -108,12 +239,16 @@ export default function DashboardPage() {
           <CardContent>
             {recentContents.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                まだコンテンツを生成していません
+                <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>まだコンテンツを生成していません</p>
+                <Button asChild className="mt-4" variant="outline">
+                  <Link href="/generate">最初のコンテンツを生成する</Link>
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
                 {recentContents.map((content) => (
-                  <div key={content.id} className="border rounded-lg p-4">
+                  <div key={content.id} className="border rounded-lg p-4 hover:border-purple-500/30 transition-colors">
                     <div className="flex items-start justify-between mb-2">
                       <div className="font-medium">{content.theme}</div>
                       <div className="text-xs text-muted-foreground">
@@ -124,12 +259,8 @@ export default function DashboardPage() {
                       {content.generated_text}
                     </p>
                     <div className="mt-2 flex gap-2">
-                      <span className="text-xs px-2 py-1 rounded bg-secondary">
-                        {content.tone}
-                      </span>
-                      <span className="text-xs px-2 py-1 rounded bg-secondary">
-                        {content.platform}
-                      </span>
+                      <Badge variant="secondary">{content.tone}</Badge>
+                      <Badge variant="secondary">{content.platform}</Badge>
                     </div>
                   </div>
                 ))}
