@@ -316,16 +316,8 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
 }
 
 export default function PricingPage() {
-  const { user } = useAuth()
-  const [currentPlan, setCurrentPlan] = useState<PlanType | null>(null)
-
-  // 実際のアプリではここでユーザーのプランを取得
-  useEffect(() => {
-    // TODO: Supabaseからユーザーのプランを取得
-    if (user) {
-      setCurrentPlan('free') // 仮の値
-    }
-  }, [user])
+  const { user, plan } = useAuth()
+  const currentPlan: PlanType | null = user ? plan : null
 
   const faqs = [
     {
@@ -567,9 +559,8 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-6xl flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
           <div className="flex gap-6 text-sm text-gray-500">
-            <Link href="#" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
-            <Link href="#" className="hover:text-cyan-400 transition-colors">利用規約</Link>
-            <Link href="#" className="hover:text-cyan-400 transition-colors">お問い合わせ</Link>
+            <Link href="/privacy" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
+            <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
           </div>
         </div>
       </footer>

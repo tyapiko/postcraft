@@ -1052,8 +1052,8 @@ export default function HomePage() {
           <div className="pt-8 border-t border-purple-500/20 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
             <div className="flex gap-6 text-sm text-gray-500">
-              <Link href="#" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
-              <Link href="#" className="hover:text-cyan-400 transition-colors">利用規約</Link>
+              <Link href="/privacy" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
+              <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
             </div>
           </div>
         </div>
