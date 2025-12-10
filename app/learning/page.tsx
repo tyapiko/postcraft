@@ -217,13 +217,14 @@ export default function LearningPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div className="mb-6">
-            <h3 className="font-semibold text-white mb-3">難易度</h3>
-            <div className="flex flex-wrap gap-3">
+            <h3 id="difficulty-filter-label" className="font-semibold text-white mb-3">難易度</h3>
+            <div className="flex flex-wrap gap-3" role="group" aria-labelledby="difficulty-filter-label">
               {difficulties.map((difficulty) => (
                 <Button
                   key={difficulty}
                   onClick={() => setSelectedDifficulty(difficulty)}
                   variant="ghost"
+                  aria-pressed={selectedDifficulty === difficulty}
                   className={`transition-all duration-300 ${
                     selectedDifficulty === difficulty
                       ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
@@ -237,13 +238,14 @@ export default function LearningPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-white mb-3">カテゴリ</h3>
-            <div className="flex flex-wrap gap-3">
+            <h3 id="category-filter-label" className="font-semibold text-white mb-3">カテゴリ</h3>
+            <div className="flex flex-wrap gap-3" role="group" aria-labelledby="category-filter-label">
               {categories.map((category) => (
                 <Button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   variant="ghost"
+                  aria-pressed={selectedCategory === category}
                   className={`transition-all duration-300 ${
                     selectedCategory === category
                       ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
@@ -265,10 +267,31 @@ export default function LearningPage() {
             ))}
           </div>
         ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-16">
-            <GraduationCap className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <div className="text-center py-16" role="status" aria-live="polite">
+            <GraduationCap className="w-16 h-16 text-gray-600 mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">コースがありません</h3>
-            <p className="text-gray-500">条件に合うコースが見つかりませんでした。</p>
+            <p className="text-gray-500 mb-4">
+              {selectedDifficulty !== 'All' && selectedCategory !== 'All'
+                ? `「${selectedDifficulty}」×「${selectedCategory}」の条件に合うコースが見つかりませんでした。`
+                : selectedDifficulty !== 'All'
+                  ? `難易度「${selectedDifficulty}」のコースが見つかりませんでした。`
+                  : selectedCategory !== 'All'
+                    ? `カテゴリ「${selectedCategory}」のコースが見つかりませんでした。`
+                    : '条件に合うコースが見つかりませんでした。'
+              }
+            </p>
+            {(selectedDifficulty !== 'All' || selectedCategory !== 'All') && (
+              <Button
+                onClick={() => {
+                  setSelectedDifficulty('All')
+                  setSelectedCategory('All')
+                }}
+                variant="outline"
+                className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+              >
+                フィルターをクリア
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

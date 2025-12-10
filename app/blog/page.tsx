@@ -175,6 +175,8 @@ export default function BlogPage() {
         {/* Category Filter */}
         <motion.div
           className="flex flex-wrap gap-3 mb-8 justify-center"
+          role="group"
+          aria-label="カテゴリフィルター"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -184,6 +186,7 @@ export default function BlogPage() {
               key={category}
               onClick={() => setSelectedCategory(category)}
               variant="ghost"
+              aria-pressed={selectedCategory === category}
               className={`transition-all duration-300 ${
                 selectedCategory === category
                   ? 'bg-green-500/20 text-green-400 border border-green-500/50'
@@ -203,10 +206,24 @@ export default function BlogPage() {
             ))}
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-16">
-            <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <div className="text-center py-16" role="status" aria-live="polite">
+            <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">記事がありません</h3>
-            <p className="text-gray-500">まだ記事が投稿されていません。</p>
+            <p className="text-gray-500 mb-4">
+              {selectedCategory !== 'All'
+                ? `カテゴリ「${selectedCategory}」の記事が見つかりませんでした。`
+                : 'まだ記事が投稿されていません。'
+              }
+            </p>
+            {selectedCategory !== 'All' && (
+              <Button
+                onClick={() => setSelectedCategory('All')}
+                variant="outline"
+                className="border-green-500/50 text-green-400 hover:bg-green-500/10"
+              >
+                フィルターをクリア
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
