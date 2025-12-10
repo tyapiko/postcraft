@@ -40,14 +40,26 @@ export default function Footer() {
               市民データサイエンティスト育成プラットフォーム
             </p>
             <div className="flex gap-4 mt-4">
-              <a href="#" className="text-gray-400 hover:text-green-500 transition-colors">
-                <Twitter size={20} />
+              <a
+                href="#"
+                className="text-gray-400 hover:text-green-500 transition-colors"
+                aria-label="Twitterでフォローする"
+              >
+                <Twitter size={20} aria-hidden="true" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-green-500 transition-colors">
-                <Github size={20} />
+              <a
+                href="#"
+                className="text-gray-400 hover:text-green-500 transition-colors"
+                aria-label="GitHubでフォローする"
+              >
+                <Github size={20} aria-hidden="true" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-green-500 transition-colors">
-                <Linkedin size={20} />
+              <a
+                href="#"
+                className="text-gray-400 hover:text-green-500 transition-colors"
+                aria-label="LinkedInでフォローする"
+              >
+                <Linkedin size={20} aria-hidden="true" />
               </a>
             </div>
           </div>
