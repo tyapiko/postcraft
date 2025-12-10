@@ -11,7 +11,8 @@
       "Bash(npm run build:*)",
       "Bash(git fetch:*)",
       "Bash(cat:*)",
-      "Bash(xargs:*)"
+      "Bash(npx next build:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
