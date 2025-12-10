@@ -10,7 +10,9 @@
       "Bash(git merge:*)",
       "Bash(npm run build:*)",
       "Bash(git fetch:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npx next build:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

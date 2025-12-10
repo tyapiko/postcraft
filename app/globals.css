@@ -287,7 +287,7 @@
   top: 0;
 }
 
-/* 減速モーション対応 */
+/* 減速モーション対応（アクセシビリティ） */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -295,5 +295,24 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* スクロールのスムーズ効果を無効化 */
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  /* 背景のパララックスや固定効果を無効化 */
+  .parallax,
+  [data-parallax] {
+    transform: none !important;
+  }
+}
+
+/* 通常時はスムーズスクロールを有効化 */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }

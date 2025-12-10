@@ -5,6 +5,7 @@ import { AuthProvider } from '@/lib/auth-context'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import LayoutWrapper from '@/components/layout/LayoutWrapper'
+import { MotionProvider } from '@/components/motion-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,9 +24,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <AuthProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+            <MotionProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </MotionProvider>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>
