@@ -155,13 +155,26 @@ export default function BooksPage() {
           <Link href="/" className="flex items-center">
             <ChapikoLogo className="text-xl md:text-2xl" />
           </Link>
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span className="hidden sm:inline">ホームに戻る</span>
-          </Link>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/blog" className="text-gray-400 hover:text-green-400 transition-colors text-sm font-medium">
+                Blog
+              </Link>
+              <Link href="/learning" className="text-gray-400 hover:text-purple-400 transition-colors text-sm font-medium">
+                Learning
+              </Link>
+              <Link href="/generate" className="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">
+                AI Generator
+              </Link>
+            </div>
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors"
+            >
+              <ArrowLeft size={20} />
+              <span className="hidden sm:inline">ホーム</span>
+            </Link>
+          </div>
         </div>
       </nav>
 
