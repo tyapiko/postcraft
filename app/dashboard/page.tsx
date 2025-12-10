@@ -76,11 +76,74 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">読み込み中...</p>
+        <div className="space-y-6" role="status" aria-label="ダッシュボードを読み込み中">
+          {/* Header Skeleton */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="h-9 w-48 bg-muted rounded-lg animate-pulse mb-2" />
+              <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+            </div>
+            <div className="h-10 w-36 bg-muted rounded-full animate-pulse" />
           </div>
+
+          {/* Stats Cards Skeleton */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-muted/50 to-muted/30" />
+                <CardHeader className="relative">
+                  <div className="h-6 w-24 bg-muted rounded animate-pulse mb-2" />
+                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                </CardHeader>
+                <CardContent className="relative">
+                  <div className="h-10 w-20 bg-muted rounded animate-pulse mb-3" />
+                  <div className="h-2 w-full bg-muted rounded animate-pulse mb-2" />
+                  <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Banner Skeleton */}
+          <Card className="relative overflow-hidden">
+            <CardContent className="flex flex-col md:flex-row items-center justify-between gap-4 py-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-muted rounded-xl animate-pulse" />
+                <div>
+                  <div className="h-6 w-48 bg-muted rounded animate-pulse mb-2" />
+                  <div className="h-4 w-64 bg-muted rounded animate-pulse" />
+                </div>
+              </div>
+              <div className="h-10 w-32 bg-muted rounded-lg animate-pulse" />
+            </CardContent>
+          </Card>
+
+          {/* Recent Contents Skeleton */}
+          <Card>
+            <CardHeader>
+              <div className="h-6 w-36 bg-muted rounded animate-pulse mb-2" />
+              <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+                      <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                    </div>
+                    <div className="h-4 w-full bg-muted rounded animate-pulse mb-1" />
+                    <div className="h-4 w-3/4 bg-muted rounded animate-pulse mb-3" />
+                    <div className="flex gap-2">
+                      <div className="h-6 w-16 bg-muted rounded-full animate-pulse" />
+                      <div className="h-6 w-20 bg-muted rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <span className="sr-only">読み込み中...</span>
         </div>
       </DashboardLayout>
     )
