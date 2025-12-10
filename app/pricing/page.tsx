@@ -287,8 +287,9 @@ const PlanCard = ({
 }
 
 // FAQ Item
-const FAQItem = ({ question, answer }: { question: string; answer: string }) => {
+const FAQItem = ({ question, answer, id }: { question: string; answer: string; id: string }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const answerId = `faq-answer-${id}`
 
   return (
     <motion.div
@@ -300,14 +301,22 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+        aria-expanded={isOpen}
+        aria-controls={answerId}
       >
         <span className="text-white font-medium pr-4">{question}</span>
-        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        />
       </button>
       <motion.div
+        id={answerId}
         initial={false}
         animate={{ height: isOpen ? 'auto' : 0 }}
         className="overflow-hidden"
+        role="region"
+        aria-labelledby={`faq-question-${id}`}
       >
         <p className="px-6 pb-6 text-gray-400">{answer}</p>
       </motion.div>
@@ -448,10 +457,10 @@ export default function PricingPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left p-4 text-gray-400 font-medium">機能</th>
-                    <th className="p-4 text-center text-white font-medium">Free</th>
-                    <th className="p-4 text-center text-cyan-400 font-medium">Pro</th>
-                    <th className="p-4 text-center text-purple-400 font-medium">Enterprise</th>
+                    <th scope="col" className="text-left p-4 text-gray-400 font-medium">機能</th>
+                    <th scope="col" className="p-4 text-center text-white font-medium">Free</th>
+                    <th scope="col" className="p-4 text-center text-cyan-400 font-medium">Pro</th>
+                    <th scope="col" className="p-4 text-center text-purple-400 font-medium">Enterprise</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -468,24 +477,45 @@ export default function PricingPage() {
                     { feature: '優先サポート', free: false, pro: false, enterprise: true },
                   ].map((row, i) => (
                     <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-4 text-gray-300">{row.feature}</td>
+                      <th scope="row" className="p-4 text-gray-300 text-left font-normal">{row.feature}</th>
                       <td className="p-4 text-center">
                         {typeof row.free === 'boolean' ? (
-                          row.free ? <Check className="w-5 h-5 text-green-400 mx-auto" /> : <span className="text-gray-600">-</span>
+                          row.free ? (
+                            <span className="flex items-center justify-center">
+                              <Check className="w-5 h-5 text-green-400" aria-hidden="true" />
+                              <span className="sr-only">対応</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-600" aria-label="非対応">-</span>
+                          )
                         ) : (
                           <span className="text-gray-400 text-sm">{row.free}</span>
                         )}
                       </td>
                       <td className="p-4 text-center">
                         {typeof row.pro === 'boolean' ? (
-                          row.pro ? <Check className="w-5 h-5 text-cyan-400 mx-auto" /> : <span className="text-gray-600">-</span>
+                          row.pro ? (
+                            <span className="flex items-center justify-center">
+                              <Check className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+                              <span className="sr-only">対応</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-600" aria-label="非対応">-</span>
+                          )
                         ) : (
                           <span className="text-cyan-400 text-sm">{row.pro}</span>
                         )}
                       </td>
                       <td className="p-4 text-center">
                         {typeof row.enterprise === 'boolean' ? (
-                          row.enterprise ? <Check className="w-5 h-5 text-purple-400 mx-auto" /> : <span className="text-gray-600">-</span>
+                          row.enterprise ? (
+                            <span className="flex items-center justify-center">
+                              <Check className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                              <span className="sr-only">対応</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-600" aria-label="非対応">-</span>
+                          )
                         ) : (
                           <span className="text-purple-400 text-sm">{row.enterprise}</span>
                         )}
@@ -515,7 +545,7 @@ export default function PricingPage() {
 
           <div className="space-y-4">
             {faqs.map((faq, i) => (
-              <FAQItem key={i} question={faq.question} answer={faq.answer} />
+              <FAQItem key={i} id={`${i}`} question={faq.question} answer={faq.answer} />
             ))}
           </div>
         </div>
