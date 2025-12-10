@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, BookOpen, GraduationCap, PlayCircle } from 'lucide-react'
+import { Clock, BookOpen, GraduationCap, PlayCircle, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,57 @@ interface Course {
 
 const difficulties = ['All', '初級', '中級', '上級']
 const categories = ['All', 'Python', 'データ分析', 'AI', '自動化']
+
+// Chapiko Logo component
+const ChapikoLogo = ({ className = '' }: { className?: string }) => (
+  <div className={`font-bold tracking-tight ${className}`}>
+    <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+      Chapiko
+    </span>
+    <span className="text-gray-400 font-normal ml-1">Inc.</span>
+  </div>
+)
+
+// Star field
+const StarField = ({ count = 100 }: { count?: number }) => {
+  const stars = useMemo(() => {
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      duration: Math.random() * 3 + 2,
+      delay: Math.random() * 5,
+    }))
+  }, [count])
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            width: star.size,
+            height: star.size,
+          }}
+          animate={{
+            opacity: [0.2, 1, 0.2],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: star.duration,
+            delay: star.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function LearningPage() {
   const [courses, setCourses] = useState<Course[]>([])
@@ -98,9 +149,41 @@ export default function LearningPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0a1a]">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a1a]/90 backdrop-blur-xl border-b border-purple-500/20">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <ChapikoLogo className="text-xl md:text-2xl" />
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">ホームに戻る</span>
+          </Link>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <div className="relative py-16 overflow-hidden bg-gradient-to-b from-purple-50 to-background dark:from-purple-950/20 dark:to-background">
+      <div className="relative pt-24 pb-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3a] to-[#0a0a1a]" />
+        <StarField count={100} />
+
+        {/* Nebula effect */}
+        <motion.div
+          className="absolute w-[600px] h-[600px] rounded-full opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)',
+            left: '-10%',
+            top: '0%',
+            filter: 'blur(60px)',
+          }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
         <div className="relative z-10 container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -109,13 +192,13 @@ export default function LearningPage() {
             className="text-center"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 border border-purple-500/30 mb-6">
-              <GraduationCap className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">E-Learning</span>
+              <GraduationCap className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-400 text-sm font-medium">E-Learning</span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-foreground">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
               スキルアップへの第一歩
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
               体系的に学べるE-ラーニングコース。
               <br className="hidden sm:block" />
               初心者から上級者まで、あなたのペースで学習を進められます。
@@ -125,16 +208,16 @@ export default function LearningPage() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 pb-16">
+      <div className="relative z-10 container mx-auto px-6 pb-16">
         {/* Filter Section */}
         <motion.div
-          className="bg-card border border-border rounded-xl p-6 mb-8"
+          className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div className="mb-6">
-            <h3 id="difficulty-filter-label" className="font-semibold text-foreground mb-3">難易度</h3>
+            <h3 id="difficulty-filter-label" className="font-semibold text-white mb-3">難易度</h3>
             <div className="flex flex-wrap gap-3" role="group" aria-labelledby="difficulty-filter-label">
               {difficulties.map((difficulty) => (
                 <Button
@@ -144,8 +227,8 @@ export default function LearningPage() {
                   aria-pressed={selectedDifficulty === difficulty}
                   className={`transition-all duration-300 ${
                     selectedDifficulty === difficulty
-                      ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/50'
-                      : 'text-muted-foreground hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-500/10 border border-transparent'
+                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                      : 'text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 border border-transparent'
                   }`}
                 >
                   {difficulty}
@@ -155,7 +238,7 @@ export default function LearningPage() {
           </div>
 
           <div>
-            <h3 id="category-filter-label" className="font-semibold text-foreground mb-3">カテゴリ</h3>
+            <h3 id="category-filter-label" className="font-semibold text-white mb-3">カテゴリ</h3>
             <div className="flex flex-wrap gap-3" role="group" aria-labelledby="category-filter-label">
               {categories.map((category) => (
                 <Button
@@ -165,8 +248,8 @@ export default function LearningPage() {
                   aria-pressed={selectedCategory === category}
                   className={`transition-all duration-300 ${
                     selectedCategory === category
-                      ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/50'
-                      : 'text-muted-foreground hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent'
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent'
                   }`}
                 >
                   {category}
@@ -180,14 +263,14 @@ export default function LearningPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-muted rounded-xl h-96 animate-pulse" />
+              <div key={i} className="bg-white/5 rounded-xl h-96 animate-pulse" />
             ))}
           </div>
         ) : filteredCourses.length === 0 ? (
           <div className="text-center py-16" role="status" aria-live="polite">
-            <GraduationCap className="w-16 h-16 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
-            <h3 className="text-xl font-semibold text-muted-foreground mb-2">コースがありません</h3>
-            <p className="text-muted-foreground mb-4">
+            <GraduationCap className="w-16 h-16 text-gray-600 mx-auto mb-4" aria-hidden="true" />
+            <h3 className="text-xl font-semibold text-gray-400 mb-2">コースがありません</h3>
+            <p className="text-gray-500 mb-4">
               {selectedDifficulty !== 'All' && selectedCategory !== 'All'
                 ? `「${selectedDifficulty}」×「${selectedCategory}」の条件に合うコースが見つかりませんでした。`
                 : selectedDifficulty !== 'All'
@@ -204,7 +287,7 @@ export default function LearningPage() {
                   setSelectedCategory('All')
                 }}
                 variant="outline"
-                className="border-purple-500/50 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10"
+                className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
               >
                 フィルターをクリア
               </Button>
@@ -222,7 +305,10 @@ export default function LearningPage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <Link href={`/learning/${course.slug}`}>
-                    <article className="group relative bg-card border border-border rounded-xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <article className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1">
+                      {/* Hover glow */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                       {course.thumbnail ? (
                         <div className="relative h-48 overflow-hidden">
                           <Image
@@ -231,16 +317,16 @@ export default function LearningPage() {
                             fill
                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a] to-transparent" />
                           <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                            <PlayCircle className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                            <span className="text-foreground text-sm font-medium">
+                            <PlayCircle className="w-6 h-6 text-purple-400" />
+                            <span className="text-white text-sm font-medium">
                               {course.lesson_count}レッスン
                             </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="h-48 bg-gradient-to-br from-purple-100 to-cyan-100 dark:from-purple-900/50 dark:to-cyan-900/50 flex items-center justify-center">
+                        <div className="h-48 bg-gradient-to-br from-purple-900/50 to-cyan-900/50 flex items-center justify-center">
                           <GraduationCap className="w-16 h-16 text-purple-400/50" />
                         </div>
                       )}
@@ -252,24 +338,24 @@ export default function LearningPage() {
                             </Badge>
                           )}
                           {course.is_free ? (
-                            <Badge className="bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+                            <Badge className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
                               無料
                             </Badge>
                           ) : (
-                            <Badge className="bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/30">
+                            <Badge className="bg-purple-500/20 text-purple-400 border border-purple-500/30">
                               ¥{course.price.toLocaleString()}
                             </Badge>
                           )}
                         </div>
-                        <h2 className="text-lg font-bold mb-3 text-foreground line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                        <h2 className="text-lg font-bold mb-3 text-white line-clamp-2 group-hover:text-purple-400 transition-colors">
                           {course.title}
                         </h2>
                         {course.description && (
-                          <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                          <p className="text-gray-400 text-sm mb-4 line-clamp-2">
                             {course.description}
                           </p>
                         )}
-                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border">
+                        <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-white/10">
                           <div className="flex items-center gap-2">
                             <Clock size={14} />
                             <span>{course.duration_minutes}分</span>
@@ -288,6 +374,14 @@ export default function LearningPage() {
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <footer className="relative border-t border-purple-500/20 py-8">
+        <div className="container mx-auto px-6 text-center">
+          <ChapikoLogo className="text-lg justify-center flex mb-4" />
+          <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   )
 }
