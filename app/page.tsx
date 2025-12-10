@@ -24,7 +24,10 @@ import {
   Cpu,
   Binary,
   Users,
-  Globe
+  Globe,
+  Twitter,
+  Github,
+  Linkedin
 } from 'lucide-react'
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion'
 import { useEffect, useState, useMemo, useRef } from 'react'
@@ -1017,10 +1020,33 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-12">
             <div className="col-span-2 md:col-span-1">
               <ChapikoLogo className="text-xl mb-4" />
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
                 市民データサイエンティストを量産し、
                 すべてのビジネスパーソンをデータ人材へ。
               </p>
+              <div className="flex gap-4">
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-purple-400 transition-colors"
+                  aria-label="Twitterでフォローする"
+                >
+                  <Twitter size={20} aria-hidden="true" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-cyan-400 transition-colors"
+                  aria-label="GitHubでフォローする"
+                >
+                  <Github size={20} aria-hidden="true" />
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-400 hover:text-purple-400 transition-colors"
+                  aria-label="LinkedInでフォローする"
+                >
+                  <Linkedin size={20} aria-hidden="true" />
+                </a>
+              </div>
             </div>
 
             <div>
