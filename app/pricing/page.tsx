@@ -16,7 +16,10 @@ import {
   BarChart,
   Shield,
   ArrowRight,
-  ChevronDown
+  ChevronDown,
+  Twitter,
+  Github,
+  Linkedin
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PLANS, PlanType } from '@/lib/plans'
@@ -585,12 +588,43 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-purple-500/20">
-        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
-          <div className="flex gap-6 text-sm text-gray-500">
-            <Link href="/privacy" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
-            <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
+      <footer className="relative z-10 border-t border-purple-500/20 py-12">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col items-center gap-6">
+            <Link href="/" className="font-bold text-xl">
+              <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Chapiko
+              </span>
+              <span className="text-gray-400 font-normal ml-1">Inc.</span>
+            </Link>
+            <div className="flex gap-6">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="Twitterでフォローする"
+              >
+                <Twitter size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                aria-label="GitHubでフォローする"
+              >
+                <Github size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="LinkedInでフォローする"
+              >
+                <Linkedin size={20} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="flex gap-6 text-sm text-gray-500">
+              <Link href="/privacy" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
+              <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
+            </div>
+            <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
           </div>
         </div>
       </footer>

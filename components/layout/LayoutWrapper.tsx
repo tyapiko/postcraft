@@ -19,7 +19,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                            pathname === '/learning' ||
                            pathname === '/books' ||
                            pathname === '/privacy' ||
-                           pathname === '/terms'
+                           pathname === '/terms' ||
+                           pathname === '/pricing'
 
   if (hideNavAndFooter) {
     return <>{children}</>

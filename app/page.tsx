@@ -236,17 +236,18 @@ const StarField = ({ count = 150 }: { count?: number }) => {
 
 // Shooting star component - 最初にたくさん流れて、その後は落ち着く
 const ShootingStars = () => {
-  const [initialBurst, setInitialBurst] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [initialBurst, setInitialBurst] = useState<Array<{ id: number; x: number; y: number; delay: number; size: number }>>([])
   const [regularStars, setRegularStars] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
   const [burstComplete, setBurstComplete] = useState(false)
 
   useEffect(() => {
-    // 最初の大量の流れ星（15個、0〜3秒の間にすべて流れる）
-    const burstStars = Array.from({ length: 15 }, (_, i) => ({
+    // 最初の大量の流れ星（25個、0〜2秒の間に一気に流れる）
+    const burstStars = Array.from({ length: 25 }, (_, i) => ({
       id: i,
-      x: Math.random() * 80 + 10,
-      y: Math.random() * 40,
-      delay: Math.random() * 2.5,
+      x: Math.random() * 70 + 5,  // 画面の5%〜75%から開始
+      y: Math.random() * 50,       // 画面の上半分から開始
+      delay: Math.random() * 1.8,  // 1.8秒以内に全て開始
+      size: Math.random() * 2 + 1, // サイズにバリエーション
     }))
     setInitialBurst(burstStars)
 
@@ -255,12 +256,12 @@ const ShootingStars = () => {
       id: i + 100,
       x: Math.random() * 100,
       y: Math.random() * 50,
-      delay: 4 + i * 3 + Math.random() * 2,
+      delay: 3 + i * 3 + Math.random() * 2,
     }))
     setRegularStars(normal)
 
-    // 4秒後にバースト完了
-    const timer = setTimeout(() => setBurstComplete(true), 4000)
+    // 3秒後にバースト完了
+    const timer = setTimeout(() => setBurstComplete(true), 3500)
     return () => clearTimeout(timer)
   }, [])
 
@@ -270,20 +271,22 @@ const ShootingStars = () => {
       {!burstComplete && initialBurst.map((star) => (
         <motion.div
           key={`burst-${star.id}`}
-          className="absolute w-1 h-1 bg-white rounded-full"
+          className="absolute bg-white rounded-full"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
-            boxShadow: '0 0 6px 2px rgba(255,255,255,0.8), -30px 0 20px rgba(255,255,255,0.4), -60px 0 30px rgba(255,255,255,0.2)',
+            width: star.size,
+            height: star.size,
+            boxShadow: `0 0 ${star.size * 4}px ${star.size * 2}px rgba(255,255,255,0.9), -${star.size * 20}px 0 ${star.size * 15}px rgba(255,255,255,0.5), -${star.size * 40}px 0 ${star.size * 25}px rgba(255,255,255,0.3)`,
           }}
           initial={{ x: 0, y: 0, opacity: 0 }}
           animate={{
-            x: [0, 250],
-            y: [0, 120],
+            x: [0, 300],
+            y: [0, 150],
             opacity: [0, 1, 1, 0],
           }}
           transition={{
-            duration: 1.2,
+            duration: 1.0,
             delay: star.delay,
             ease: 'easeOut',
           }}
