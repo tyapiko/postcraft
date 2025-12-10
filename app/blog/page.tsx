@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, Eye, FileText, ArrowLeft, BookOpen } from 'lucide-react'
+import { Calendar, Eye, FileText, ArrowLeft, BookOpen, Twitter, Github, Linkedin } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -297,10 +297,39 @@ export default function BlogPage() {
       </div>
 
       {/* Footer */}
-      <footer className="relative border-t border-purple-500/20 py-8">
-        <div className="container mx-auto px-6 text-center">
-          <ChapikoLogo className="text-lg justify-center flex mb-4" />
-          <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
+      <footer className="relative border-t border-purple-500/20 py-12">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col items-center gap-6">
+            <ChapikoLogo className="text-xl" />
+            <div className="flex gap-6">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="Twitterでフォローする"
+              >
+                <Twitter size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                aria-label="GitHubでフォローする"
+              >
+                <Github size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="LinkedInでフォローする"
+              >
+                <Linkedin size={20} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="flex gap-6 text-sm text-gray-500">
+              <Link href="/privacy" className="hover:text-cyan-400 transition-colors">プライバシーポリシー</Link>
+              <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
+            </div>
+            <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

@@ -14,7 +14,10 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                            pathname === '/login' ||
                            pathname === '/signup' ||
                            pathname?.startsWith('/settings') ||
-                           pathname?.startsWith('/history')
+                           pathname?.startsWith('/history') ||
+                           pathname === '/blog' ||
+                           pathname === '/learning' ||
+                           pathname === '/books'
 
   if (hideNavAndFooter) {
     return <>{children}</>
