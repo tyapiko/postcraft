@@ -1,8 +1,18 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Shield, Lock, Eye, Database, Mail, Globe } from 'lucide-react'
+import { Shield, Lock, Eye, Database, Mail, Globe, ArrowLeft, Twitter, Github, Linkedin } from 'lucide-react'
 import Link from 'next/link'
+
+// Chapiko Logo component
+const ChapikoLogo = ({ className = '' }: { className?: string }) => (
+  <div className={`font-bold tracking-tight ${className}`}>
+    <span className="bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+      Chapiko
+    </span>
+    <span className="text-gray-400 font-normal ml-1">Inc.</span>
+  </div>
+)
 
 export default function PrivacyPolicyPage() {
   return (
@@ -31,7 +41,20 @@ export default function PrivacyPolicyPage() {
         ))}
       </div>
 
-      <div className="container mx-auto px-4 py-16 relative z-10">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-purple-500/20">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <ChapikoLogo className="text-xl md:text-2xl" />
+          </Link>
+          <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-colors">
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">ホーム</span>
+          </Link>
+        </div>
+      </nav>
+
+      <div className="container mx-auto px-4 pt-24 pb-16 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -201,17 +224,44 @@ export default function PrivacyPolicyPage() {
             </div>
           </div>
 
-          {/* Back link */}
-          <div className="text-center mt-8">
-            <Link
-              href="/"
-              className="text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              ← トップページに戻る
-            </Link>
-          </div>
         </motion.div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative border-t border-purple-500/20 py-12">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col items-center gap-6">
+            <ChapikoLogo className="text-xl" />
+            <div className="flex gap-6">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="Twitterでフォローする"
+              >
+                <Twitter size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+                aria-label="GitHubでフォローする"
+              >
+                <Github size={20} aria-hidden="true" />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
+                aria-label="LinkedInでフォローする"
+              >
+                <Linkedin size={20} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="flex gap-6 text-sm text-gray-500">
+              <Link href="/terms" className="hover:text-cyan-400 transition-colors">利用規約</Link>
+            </div>
+            <p className="text-sm text-gray-500">© 2024 Chapiko Inc. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
