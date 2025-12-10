@@ -234,25 +234,65 @@ const StarField = ({ count = 150 }: { count?: number }) => {
   )
 }
 
-// Shooting star component
+// Shooting star component - 最初にたくさん流れて、その後は落ち着く
 const ShootingStars = () => {
-  const [shootingStars, setShootingStars] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [initialBurst, setInitialBurst] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [regularStars, setRegularStars] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([])
+  const [burstComplete, setBurstComplete] = useState(false)
 
   useEffect(() => {
-    const stars = Array.from({ length: 5 }, (_, i) => ({
+    // 最初の大量の流れ星（15個、0〜3秒の間にすべて流れる）
+    const burstStars = Array.from({ length: 15 }, (_, i) => ({
       id: i,
+      x: Math.random() * 80 + 10,
+      y: Math.random() * 40,
+      delay: Math.random() * 2.5,
+    }))
+    setInitialBurst(burstStars)
+
+    // 通常の流れ星（5個、バースト後に継続）
+    const normal = Array.from({ length: 5 }, (_, i) => ({
+      id: i + 100,
       x: Math.random() * 100,
       y: Math.random() * 50,
-      delay: i * 3 + Math.random() * 2,
+      delay: 4 + i * 3 + Math.random() * 2,
     }))
-    setShootingStars(stars)
+    setRegularStars(normal)
+
+    // 4秒後にバースト完了
+    const timer = setTimeout(() => setBurstComplete(true), 4000)
+    return () => clearTimeout(timer)
   }, [])
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {shootingStars.map((star) => (
+      {/* 最初のバースト（一度だけ流れる） */}
+      {!burstComplete && initialBurst.map((star) => (
         <motion.div
-          key={star.id}
+          key={`burst-${star.id}`}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+            boxShadow: '0 0 6px 2px rgba(255,255,255,0.8), -30px 0 20px rgba(255,255,255,0.4), -60px 0 30px rgba(255,255,255,0.2)',
+          }}
+          initial={{ x: 0, y: 0, opacity: 0 }}
+          animate={{
+            x: [0, 250],
+            y: [0, 120],
+            opacity: [0, 1, 1, 0],
+          }}
+          transition={{
+            duration: 1.2,
+            delay: star.delay,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+      {/* 通常の流れ星（継続的にループ） */}
+      {regularStars.map((star) => (
+        <motion.div
+          key={`regular-${star.id}`}
           className="absolute w-1 h-1 bg-white rounded-full"
           style={{
             left: `${star.x}%`,
