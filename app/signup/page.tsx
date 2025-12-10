@@ -8,8 +8,89 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Loader2, Rocket, ArrowLeft, Sparkles } from 'lucide-react'
+import { Loader2, Rocket, ArrowLeft, Sparkles, Check, X } from 'lucide-react'
 import { motion } from 'framer-motion'
+
+// Password strength calculator
+const calculatePasswordStrength = (password: string): {
+  score: number
+  label: string
+  color: string
+  bgColor: string
+  requirements: { met: boolean; text: string }[]
+} => {
+  const requirements = [
+    { met: password.length >= 6, text: '6文字以上' },
+    { met: password.length >= 8, text: '8文字以上（推奨）' },
+    { met: /[A-Z]/.test(password), text: '大文字を含む' },
+    { met: /[a-z]/.test(password), text: '小文字を含む' },
+    { met: /[0-9]/.test(password), text: '数字を含む' },
+    { met: /[^A-Za-z0-9]/.test(password), text: '特殊文字を含む' },
+  ]
+
+  const metCount = requirements.filter(r => r.met).length
+
+  if (metCount <= 1) {
+    return { score: 0, label: '非常に弱い', color: 'text-red-400', bgColor: 'bg-red-500', requirements }
+  } else if (metCount <= 2) {
+    return { score: 1, label: '弱い', color: 'text-orange-400', bgColor: 'bg-orange-500', requirements }
+  } else if (metCount <= 4) {
+    return { score: 2, label: '普通', color: 'text-yellow-400', bgColor: 'bg-yellow-500', requirements }
+  } else if (metCount <= 5) {
+    return { score: 3, label: '強い', color: 'text-green-400', bgColor: 'bg-green-500', requirements }
+  } else {
+    return { score: 4, label: '非常に強い', color: 'text-emerald-400', bgColor: 'bg-emerald-500', requirements }
+  }
+}
+
+// Password strength indicator component
+const PasswordStrengthIndicator = ({ password }: { password: string }) => {
+  const strength = calculatePasswordStrength(password)
+
+  if (!password) return null
+
+  return (
+    <div className="space-y-3 mt-3" role="status" aria-live="polite">
+      {/* Strength bar */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-400">パスワード強度</span>
+          <span className={`text-xs font-medium ${strength.color}`}>{strength.label}</span>
+        </div>
+        <div className="flex gap-1" role="progressbar" aria-valuenow={strength.score} aria-valuemin={0} aria-valuemax={4} aria-label={`パスワード強度: ${strength.label}`}>
+          {[0, 1, 2, 3, 4].map((level) => (
+            <div
+              key={level}
+              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                level <= strength.score ? strength.bgColor : 'bg-white/10'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Requirements checklist */}
+      <ul className="space-y-1" aria-label="パスワード要件">
+        {strength.requirements.map((req, index) => (
+          <li
+            key={index}
+            className={`flex items-center gap-2 text-xs transition-colors ${
+              req.met ? 'text-green-400' : 'text-gray-500'
+            }`}
+          >
+            {req.met ? (
+              <Check className="w-3 h-3" aria-hidden="true" />
+            ) : (
+              <X className="w-3 h-3" aria-hidden="true" />
+            )}
+            <span>{req.text}</span>
+            <span className="sr-only">{req.met ? '（達成）' : '（未達成）'}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 // Chapiko Logo component
 const ChapikoLogo = ({ className = '' }: { className?: string }) => (
@@ -201,9 +282,12 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
+                aria-describedby="password-strength"
                 className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20"
               />
-              <p className="text-xs text-gray-500">6文字以上で入力してください</p>
+              <div id="password-strength">
+                <PasswordStrengthIndicator password={password} />
+              </div>
             </div>
             <Button
               type="submit"
