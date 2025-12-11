@@ -22,6 +22,19 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // 認証チェック
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: '認証が必要です' })
+  }
+
+  const token = authHeader.replace('Bearer ', '')
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+  if (authError || !user) {
+    return res.status(401).json({ error: '認証に失敗しました' })
+  }
+
   try {
     const form = formidable({})
     const [fields, files] = await form.parse(req)
