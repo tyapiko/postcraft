@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Upload, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { supabase } from '@/lib/supabase'
 
 interface ImageUploaderProps {
   value?: string
@@ -25,12 +26,22 @@ export default function ImageUploader({ value, onChange, onRemove, bucket }: Ima
 
     setUploading(true)
     try {
+      // 認証トークンを取得
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        alert('ログインが必要です')
+        return
+      }
+
       const formData = new FormData()
       formData.append('file', file)
       formData.append('bucket', bucket)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: formData,
       })
 

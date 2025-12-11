@@ -42,10 +42,18 @@ export default function GeneratePage() {
     setResults([])
 
     try {
+      // 認証トークンを取得
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        toast.error('ログインが必要です')
+        return
+      }
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           theme,
@@ -104,10 +112,18 @@ export default function GeneratePage() {
     if (!user) return
 
     try {
+      // 認証トークンを取得
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        toast.error('ログインが必要です')
+        return
+      }
+
       const response = await fetch('/api/save/notion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           theme,
