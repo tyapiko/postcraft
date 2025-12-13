@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rm -rf .next && next build",
+    "build": "npx rimraf .next && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -77,6 +77,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/formidable": "^3.4.6"
+    "@types/formidable": "^3.4.6",
+    "rimraf": "^6.1.2"
   }
 }
