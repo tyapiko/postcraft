@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /notifications/
+Disallow: /history/
+Disallow: /generate/
+Disallow: /invite/
+Disallow: /quiz/
+Disallow: /learn/
+
+Sitemap: https://chapiko-ai.com/sitemap.xml

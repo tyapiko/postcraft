@@ -12,7 +12,8 @@
       "Bash(git fetch:*)",
       "Bash(cat:*)",
       "Bash(npx next build:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
