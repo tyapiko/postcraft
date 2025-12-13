@@ -668,7 +668,7 @@ export default function HomePage() {
 
                 <h1 className="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4 sm:mb-6">
                   <GlitchText
-                    text="データの宇宙に飛び立とう"
+                    text="データの宇宙へ旅立とう"
                     className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent block whitespace-nowrap"
                   />
                 </h1>
