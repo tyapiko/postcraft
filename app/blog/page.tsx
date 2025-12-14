@@ -172,7 +172,7 @@ export default function BlogPage() {
               <span className="text-green-400 text-sm font-medium">Knowledge Base</span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-green-200 to-white bg-clip-text text-transparent">
-              AI Blog
+              AI ブログ
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
               データサイエンスとAIの最新情報をお届け。
